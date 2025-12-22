@@ -1,0 +1,111 @@
+\documentclass[10pt]{article}
+
+% --- Paquetes Básicos ---
+\usepackage[utf8]{inputenc}
+\usepackage[spanish]{babel}
+\usepackage{amsmath, amssymb, amsthm, amsfonts}
+\usepackage{geometry}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{booktabs}
+
+% --- Configuración de Márgenes ---
+\geometry{margin=1in}
+
+% --- Definición de Operadores Matemáticos ---
+\DeclareMathOperator*{\argmin}{arg\,min}
+\newtheorem{definition}{Definición}
+\newtheorem{theorem}{Teorema}
+
+% --- Configuración para Código C++ ---
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\lstset{
+    language=C++,
+    basicstyle=\ttfamily\small,
+    keywordstyle=\color{blue},
+    commentstyle=\color{codegreen},
+    stringstyle=\color{codepurple},
+    breaklines=true,
+    numbers=left,
+    numberstyle=\tiny\color{codegray}
+}
+
+% --- Información del Proyecto ---
+\title{Optimización de Red de Fibra Óptica \\ (Degree-Constrained Minimum Spanning Tree) \\ \large Diseño y Análisis de Algoritmos - Universidad de La Habana}
+\author{Ernesto Abreu Peraza, Eduardo Brito Labrada}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+Este informe detalla el análisis y la solución al problema del Árbol de Expansión Mínimo con Grado Restringido (DCMST) para la infraestructura de red de la Universidad de La Habana. Se presenta la formalización matemática, la demostración de su complejidad NP-Hard y una comparativa experimental entre diferentes algoritmos implementados en C++.
+\end{abstract}
+
+\newpage
+\tableofcontents
+\newpage
+
+\section{Formalización del Problema}
+Partiendo de la necesidad de interconectar los edificios de la universidad minimizando costos y respetando la capacidad de puertos de ETECSA, definimos el modelo matemático.
+
+\subsection{Modelo Matemático}
+Sea $G = (V, E)$ un grafo conexo y no dirigido, donde:
+\begin{itemize}
+    \item $V$ es el conjunto de edificios.
+    \item $E$ es el conjunto de posibles conexiones de fibra.
+    \item $w: E \to \mathbb{R}^+$ es una función de costo.
+    \item $k: V \to \mathbb{N}$ es la capacidad de puertos por edificio.
+\end{itemize}
+
+El problema consiste en encontrar un subgrafo $T = (V, E')$ tal que:
+\begin{equation}
+    T^* = \argmin_{T \in \mathcal{T}} \sum_{e \in E'} w(e)
+\end{equation}
+Sujeto a:
+\begin{enumerate}
+    \item $T$ es un árbol de expansión de $G$.
+    \item $\forall v \in V, \text{deg}_T(v) \leq k(v)$.
+\end{enumerate}
+
+Este problema es conocido como \textit{Degree-Constrained Minimum Spanning Tree} (DCMST).
+
+\section{Análisis de Complejidad Computacional}
+\subsection{Demostración de NP-Hardness}
+Para demostrar que el problema es NP-Hard, realizamos una reducción desde el problema \textit{Hamiltonian Path}, un conocido problema NP-Completo. 
+\begin{theorem}
+El problema DCMST es NP-Hard.
+\end{theorem}
+\begin{proof}
+Dada una instancia del problema \textit{Hamiltonian Path}, construimos una instancia del problema DCMST donde cada vértice tiene grado máximo 2. Si existe un árbol de expansión que cumpla las restricciones de grado,
+entonces tenemos un camino de hamilton del grafo original.
+
+Si supieramos resolver DCMST en tiempo polinomial, podríamos resolver \textit{Hamiltonian Path} en tiempo polinomial.
+
+Por lo tanto, DCMST es NP-Hard.
+\end{proof}
+
+\subsection{Degree-Constrained Spanning Tree}
+
+El problema de decisión Degree-Constrained Spanning Tree (DCST), en el cual queremos saber si existe un árbol de expansión que cumpla con las restricciones de grado, es NP-Completo. 
+Ya que es fácil verificar que un árbol dado es de expansión de $G$ y cumple con las restricciones de grado en tiempo polinomial.
+
+\section{Diseño de Soluciones Algorítmicas}
+\section{Implementación y Análisis Experimental}
+\section{Conclusiones}
+
+\newpage
+
+\begin{thebibliography}{9}
+\bibitem{clrs} 
+Cormen, T. H., Leiserson, C. E., Rivest, R. L., \& Stein, C. (2009). 
+\textit{Introduction to Algorithms} (3rd ed., Chapter 34). 
+MIT Press.
+\end{thebibliography}
+
+\end{document}
