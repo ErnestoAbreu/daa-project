@@ -1,46 +1,79 @@
-\documentclass[10pt]{article}
+\documentclass[twoside,10pt]{article}
 
-% --- Paquetes Básicos ---
+% --- Paquetes de Idioma y Codificación ---
 \usepackage[utf8]{inputenc}
-\usepackage[spanish]{babel}
+\usepackage[T1]{fontenc}
+\usepackage[spanish,es-tabla]{babel} 
+
+% --- Paquetes Matemáticos y Teoremas ---
 \usepackage{amsmath, amssymb, amsthm, amsfonts}
+\usepackage{mathtools}
+
+% --- Paquetes de Diseño, Gráficos y Tablas ---
 \usepackage{geometry}
 \usepackage{graphicx}
-\usepackage{hyperref}
+\usepackage{booktabs} 
+\usepackage{float}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{authblk} 
+
+% --- Paquetes para Código Fuente ---
 \usepackage{listings}
 \usepackage{xcolor}
-\usepackage{booktabs}
+
+% --- Configuración de Hipervínculos ---
+\usepackage{hyperref}
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue,
+    citecolor=red,
+    urlcolor=blue
+}
 
 % --- Configuración de Márgenes ---
-\geometry{margin=1in}
+\geometry{top=2.5cm, bottom=2.5cm, left=2.5cm, right=2.5cm}
 
-% --- Definición de Operadores Matemáticos ---
+% --- Definiciones Matemáticas ---
 \DeclareMathOperator*{\argmin}{arg\,min}
-\newtheorem{definition}{Definición}
-\newtheorem{theorem}{Teorema}
-\newtheorem{lemma}[theorem]{Lema}    % Lemma shares counter with theorem
+\newtheorem{definition}{Definición}[section]
+\newtheorem{theorem}{Teorema}[section]
+\newtheorem{lemma}[theorem]{Lema}
 
-% --- Configuración para Código C++ ---
+% --- Estilo de Código C++ ---
 \definecolor{codegreen}{rgb}{0,0.6,0}
 \definecolor{codegray}{rgb}{0.5,0.5,0.5}
 \definecolor{codepurple}{rgb}{0.58,0,0.82}
-\lstset{
-    language=C++,
-    basicstyle=\ttfamily\small,
-    keywordstyle=\color{blue},
+\definecolor{backcolour}{rgb}{0.96,0.96,0.96}
+
+\lstdefinestyle{cppstyle}{
+    backgroundcolor=\color{backcolour},   
     commentstyle=\color{codegreen},
+    keywordstyle=\color{blue},
+    numberstyle=\tiny\color{codegray},
     stringstyle=\color{codepurple},
-    breaklines=true,
-    numbers=left,
-    numberstyle=\tiny\color{codegray}
+    basicstyle=\ttfamily\footnotesize,
+    breakatwhitespace=false,         
+    breaklines=true,                 
+    captionpos=b,                    
+    keepspaces=true,                 
+    numbers=left,                    
+    numbersep=5pt,                  
+    showspaces=false,                
+    showstringspaces=false,
+    showtabs=false,                  
+    tabsize=2,
+    language=C++
 }
+\lstset{style=cppstyle}
 
-\usepackage{amsthm} % Load the theorem package
+% --- Título y Autores ---
+\title{\textbf{Optimización de Red de Fibra Óptica \\ (Degree-Constrained Minimum Spanning Tree)}}
 
+\author[1]{Ernesto Abreu Peraza}
+\author[1]{Eduardo Brito Labrada}
+\affil[1]{Diseño y Análisis de Algoritmos - Universidad de La Habana}
 
-% --- Información del Proyecto ---
-\title{Optimización de Red de Fibra Óptica \\ (Degree-Constrained Minimum Spanning Tree) \\ \large Diseño y Análisis de Algoritmos - Universidad de La Habana}
-\author{Ernesto Abreu Peraza, Eduardo Brito Labrada}
 \date{\today}
 
 \begin{document}
@@ -48,7 +81,7 @@
 \maketitle
 
 \begin{abstract}
-Este informe detalla el análisis y la solución al problema del Árbol de Expansión Mínimo con Grado Restringido (DCMST) para la infraestructura de red de la Universidad de La Habana. Se presenta la formalización matemática, la demostración de su complejidad NP-Hard y una comparativa experimental entre diferentes algoritmos implementados en C++.
+\noindent Este informe detalla el análisis y la solución al problema del Árbol de Expansión Mínimo con Grado Restringido (DCMST) para la infraestructura de red de la Universidad de La Habana. Se presenta la formalización matemática, la demostración de su complejidad NP-Hard y una comparativa experimental entre diferentes algoritmos implementados en C++.
 \end{abstract}
 
 \newpage
@@ -79,36 +112,35 @@ Sujeto a:
 
 Este problema es conocido como \textit{Degree-Constrained Minimum Spanning Tree} (DCMST).
 
+
+
 \section{Análisis de Complejidad Computacional}
 \subsection{Demostración de NP-Hardness}
 Para demostrar que el problema es NP-Hard, realizamos una reducción desde el problema \textit{Hamiltonian Path}, un conocido problema NP-Completo. 
+
 \begin{theorem}
 El problema DCMST es NP-Hard.
 \end{theorem}
 \begin{proof}
-Dada una instancia del problema \textit{Hamiltonian Path}, construimos una instancia del problema DCMST donde cada vértice tiene grado máximo 2. Si existe un árbol de expansión que cumpla las restricciones de grado,
-entonces tenemos un camino de hamilton del grafo original.
+Dada una instancia del problema \textit{Hamiltonian Path}, construimos una instancia del problema DCMST donde cada vértice tiene grado máximo 2. Si existe un árbol de expansión que cumpla las restricciones de grado, entonces tenemos un camino de Hamilton del grafo original.
 
-Si supieramos resolver DCMST en tiempo polinomial, podríamos resolver \textit{Hamiltonian Path} en tiempo polinomial.
 
-Por lo tanto, DCMST es NP-Hard.
+
+Si supiéramos resolver DCMST en tiempo polinomial, podríamos resolver \textit{Hamiltonian Path} en tiempo polinomial. Por lo tanto, DCMST es NP-Hard.
 \end{proof}
 
 \subsection{Degree-Constrained Spanning Tree}
-
-El problema de decisión Degree-Constrained Spanning Tree (DCST), en el cual queremos saber si existe un árbol de expansión que cumpla con las restricciones de grado, es NP-Completo. 
-Ya que es fácil verificar que un árbol dado es de expansión de $G$ y cumple con las restricciones de grado en tiempo polinomial.
+El problema de decisión Degree-Constrained Spanning Tree (DCST), en el cual queremos saber si existe un árbol de expansión que cumpla con las restricciones de grado, es NP-Completo. Ya que es fácil verificar que un árbol dado es de expansión de $G$ y cumple con las restricciones de grado en tiempo polinomial.
 
 \section{Diseño de Soluciones Algorítmicas}
+Se desarrollaron e implementaron cuatro enfoques principales. El código fuente completo de cada implementación se encuentra en el Apéndice A.
 
 \subsection{Enumeración con Máscara de Bits para el DCMST}
-
 Esta es una solución exacta para el problema DCMST basada en \textbf{enumeración exhaustiva mediante máscara de bits}. Esta solución está diseñada para instancias de tamaño pequeño, sirviendo como algoritmo de referencia y verificación de metaheurísticas.
 
-El algoritmo explora todos los subconjuntos posibles de aristas que contienen exactamente $|V| - 1$ aristas y verifica cuáles inducen un árbol generador que cumple con la restricción de grado. Entre todas las soluciones factibles, selecciona la de costo mínimo.
+El algoritmo explora todos los subconjuntos posibles de aristas que contienen exactamente $|V| - 1$ aristas y verifica cuáles inducen un árbol generador que cumple con la restricción de grado. Entre todas las soluciones factibles, selecciona la de costo mínimo. La implementación completa se encuentra en el Apéndice \ref{sec:code_bitmask}.
 
 \subsubsection{Descripción del Algoritmo}
-
 Sea $G = (V, E)$ un grafo completo, no dirigido y ponderado, con $|V| = n$ vértices y $|E| = m = \dfrac{n(n-1)}{2}$ aristas. El algoritmo procede de la siguiente manera:
 
 \begin{enumerate}
@@ -121,22 +153,20 @@ Sea $G = (V, E)$ un grafo completo, no dirigido y ponderado, con $|V| = n$ vért
         \item El subgrafo es conexo (usando Depth-First Search).
         \item El grado de cada vértice es a lo sumo $k$.
     \end{itemize}
-    \item Si ambas condiciones se cumplen, el sugrafo es un árbol generador factible y se evalúa su costo.
+    \item Si ambas condiciones se cumplen, el subgrafo es un árbol generador factible y se evalúa su costo.
     \item Se devuelve el mínimo costo entre todas las soluciones factibles.
 \end{enumerate}
 
 El uso de una máscara de bits permite representar subconjuntos de aristas de forma compacta y eficiente a nivel de implementación.
 
 \subsubsection{Análisis de Correctitud}
-
 Demostraremos que el algoritmo es correcto, es decir, que devuelve exactamente el costo del árbol generador mínimo con restricción de grado.
 
 \begin{lemma}\label{lem:exhaustivity1}
     El algoritmo examina \textbf{todos} los subconjuntos de aristas de tamaño $n-1$.
 \end{lemma}
 \begin{proof}
-    Cada máscara de bits $m$ representa un subconjunto único de aristas. Al iterar sobre todas las máscaras
-    con $\text{popcount(mask)} = n-1$, se enumeran exactamente todos los subconjuntos de $E$ con $n-1$ aristas.
+    Cada máscara de bits $m$ representa un subconjunto único de aristas. Al iterar sobre todas las máscaras con $\text{popcount(mask)} = n-1$, se enumeran exactamente todos los subconjuntos de $E$ con $n-1$ aristas.
 \end{proof}
 
 \begin{lemma}\label{lem:factible_dcst1}
@@ -161,29 +191,23 @@ Demostraremos que el algoritmo es correcto, es decir, que devuelve exactamente e
     El algoritmo devuelve el costo mínimo entre todos los árboles generadores que cumplen la restricción de grado.
 \end{theorem}
 \begin{proof}
-    Por el Lema \ref{lem:exhaustivity1}, el algoritmo considera todas las soluciones candidatas. Por el Lema \ref{lem:factible_dcst}, acepta exactamente las soluciones factibles. Finalmente, toma el mínimo costo entre ellas. Por lo tanto, el resultado es óptimo.
+    Por el Lema \ref{lem:exhaustivity1}, el algoritmo considera todas las soluciones candidatas. Por el Lema \ref{lem:factible_dcst1}, acepta exactamente las soluciones factibles. Finalmente, toma el mínimo costo entre ellas. Por lo tanto, el resultado es óptimo.
 \end{proof}
 
 \subsubsection{Análisis de Complejidad}
-
 El número total de máscaras es $2^m$, pero las máscaras consideradas efectivamente son $\binom{m}{n-1}$ y por cada una de ellas se hace lo siguiente:
 \begin{itemize}
     \item Construcción del subgrafo: $O(n)$.
     \item Verificación de grados: $O(n)$.
     \item DFS para conectividad: $O(n)$.
 \end{itemize}
-
 Por tanto, el costo por máscara es $O(n)$ y la complejidad total es: $O(2^m + \binom{m}{n-1} \cdot n)$.
 
-
 \subsection{Enumeración Lexicográfica para el DCMST}
-
-El algoritmo se basa en la enumeración exhaustiva de subconjuntos de aristas mediante una representación binaria y generación lexicográfica de combinaciones. Su aplicabilidad es sobre todo para instancias de tamaño reducido y es aplicable como algoritmo de referencia para la validación de metaheurísticas.
+El algoritmo se basa en la enumeración exhaustiva de subconjuntos de aristas mediante una representación binaria y generación lexicográfica de combinaciones. Su aplicabilidad es sobre todo para instancias de tamaño reducido y es aplicable como algoritmo de referencia para la validación de metaheurísticas. (Ver Apéndice \ref{sec:code_comb}).
 
 \subsubsection{Descripción del Algoritmo}
-
 Sea $G = (V,E)$ un grafo completo con $|V| = n$ vértices y $|E| = m = \frac{n(n-1)}{2}$ aristas. El algoritmo procede como sigue:
-
 \begin{enumerate} 
     \item Se indexan todas las aristas de $E$. 
     \item Se construye una cadena binaria \texttt{state} de longitud $m$ con exactamente $n-1$ bits activos. 
@@ -201,7 +225,6 @@ Sea $G = (V,E)$ un grafo completo con $|V| = n$ vértices y $|E| = m = \frac{n(n
 La generación de subconjuntos se realiza mediante la función \texttt{next\_permutation}, lo que garantiza que cada combinación se visita exactamente una vez.
 
 \subsubsection{Análisis de Correctitud}
-
 \begin{lemma}\label{lem:exhaustivity2}
     El algoritmo enumera todos los subconjuntos de aristas de tamaño $n-1$.
 \end{lemma}
@@ -235,20 +258,135 @@ La generación de subconjuntos se realiza mediante la función \texttt{next\_per
 \end{proof}
 
 \subsubsection{Análisis de Complejidad}
-
 El número de combinaciones evaluadas es: $\binom{m}{n-1}$ y para cada combinación:
 \begin{itemize} 
     \item Construcción del subgrafo: $O(n)$. 
     \item Verificación de grados: $O(n)$. 
     \item DFS de conectividad: $O(n)$. 
 \end{itemize}
-
 Por lo tanto, la complejidad es $O(\binom{m}{n-1} \cdot n)$.
 
+\subsection{Enumeración con Código de Gray}
+A continuación se presenta dos algoritmos exactos para el DCMST basados en la enumeración exhaustiva de subconjuntos de aristas utilizando Código de Gray. El enfoque garantiza que subconjuntos consecutivos difieran en exactamente una arista, lo que permite una generación sistemática y eficiente del espacio de soluciones. Se propondrá una solución recursiva con podas.
+
+\subsubsection{Marco Teórico: Código de Gray}
+El código de Gray constituye una secuencia de representaciones binarias tal que dos códigos consecutivos difieren exactamente en un solo bit. Formalmente, el código Gray de un entero $n$ se define como:
+$$G(n) = n \oplus (n>>1)$$
+
+
+
+Una técnica para generar todas las combinaciones de tamaño $K$ consiste en generar la secuencia completa de códigos Gray para los enteros desde $0$ hasta $2^N - 1$ y filtrar únicamente aquellas máscaras que contienen exactamente $K$ bits activos. Un resultado fundamental es que, en la secuencia filtrada, dos combinaciones adyacentes (consideradas en sentido cíclico) difieren exactamente en dos bits, lo que equivale a eliminar un elemento y añadir otro.
+
+Esta propiedad puede demostrarse por inducción utilizando la construcción recursiva del código Gray:
+$$G(N) = 0G(N-1) \cup 1G(N-1)^R$$
+
+\subsubsection{Descripción del Algoritmo Gray Iterativo}
+Sea $G = (V,E)$ un grafo completo con $|V| = n$ vértices y $|E| = m = \frac{n(n-1)}{2}$ aristas. El algoritmo procede como sigue:
+
+El algoritmo genera todas las máscaras de bits correspondientes a los códigos Gray de longitud $m$. Para cada máscara se verifica si contiene exactamente $n-1$ bits activos, lo que corresponde a un subconjunto candidato a árbol generador. (Ver Apéndice \ref{sec:code_gray_iter}).
+
+Para cada subconjunto válido, se construye el grafo inducido y se comprueba: 
+\begin{itemize} 
+    \item Que el grado de cada vértice no exceda $k$; 
+    \item Que el grafo sea conexo, mediante un DFS. 
+\end{itemize}
+
+El costo mínimo entre todas las configuraciones factibles es devuelto como solución.
+
+\subsubsection{Análisis de Correctitud del Algoritmo Gray Iterativo}
+\begin{lemma}\label{lem:exhaustivity3}
+    El algoritmo enumera exhaustivamente todos los subconjuntos de aristas de tamaño $n-1$. 
+\end{lemma}
+\begin{proof} 
+    La secuencia de códigos Gray recorre todas las máscaras binarias de longitud $m$. El filtrado por número de bits activos igual a $n-1$ garantiza que se consideran exactamente todos los subconjuntos de ese tamaño. 
+\end{proof}
+
+\begin{lemma}\label{lem:factible_dcst3}
+    Todo subconjunto aceptado por el algoritmo que pasa las verificaciones corresponde a un árbol generador factible. 
+\end{lemma}
+\begin{proof} 
+    Un subconjunto con $n-1$ aristas que induce un grafo conexo es, por definición, un árbol generador. La verificación adicional del grado asegura el cumplimiento de la restricción $\deg(v) \le k$ para todo vértice $v$. 
+\end{proof}
+
+\begin{theorem} 
+    El algoritmo Gray iterativo devuelve un árbol generador mínimo que satisface la restricción de grado. 
+\end{theorem}
+\begin{proof} 
+    Por el Lema \ref{lem:exhaustivity3} y por el Lema \ref{lem:factible_dcst3} el algoritmo evalúa exhaustivamente todas las soluciones factibles y selecciona aquella de menor costo, la solución devuelta es óptima.
+\end{proof}
+
+\subsubsection{Análisis de Complejidad del Algoritmo Gray Iterativo}
+El algoritmo recorre $2^m$ máscaras, y analiza aquellas con exactamente $n-1$ aristas. Para cada una, la verificación de conectividad y grados requiere $O(n)$ tiempo. Por lo tanto, la complejidad temporal es: $O(2^m + \binom{m}{n-1} \cdot n)$.
+
+\subsubsection{Descripción del Algoritmo Gray Recursivo}
+El algoritmo Gray recursivo implementa directamente la relación:
+$$G(N, K) = 0G(N-1, K) \cup 1G(N-1, K-1)^\text{R}$$
+construyendo únicamente combinaciones válidas de $k = n-1$ aristas. (Ver Apéndice \ref{sec:code_gray_rec}).
+
+Durante la recursión, se mantiene de forma incremental: 
+\begin{itemize} 
+    \item el costo acumulado; 
+    \item la estructura de adyacencia; 
+    \item las restricciones de grado. 
+\end{itemize}
+
+Las ramas que violan la restricción de grado se podan anticipadamente.
+
+\subsubsection{Análisis de Correctitud del Algoritmo Gray Recursivo}
+\begin{lemma}\label{lem:exhaustivity4}
+    El algoritmo genera exactamente todas las combinaciones de $n-1$ aristas sin repetición. 
+\end{lemma}
+\begin{proof} 
+    La recurrencia $G(N,K)$ genera todas las combinaciones binarias de longitud $N$ con exactamente $K$ bits activos, sin duplicados, por construcción inductiva. 
+\end{proof}
+
+\begin{lemma}\label{lem:factible_dcst4}
+    Toda solución considerada por el algoritmo cumple la restricción de grado. 
+\end{lemma}
+\begin{proof} 
+    Antes de continuar la recursión, el algoritmo verifica que el grado de los vértices involucrados no exceda $K$. Las ramas inválidas son descartadas. 
+\end{proof}
+
+\begin{theorem} 
+    El algoritmo Gray recursivo produce una solución óptima del DCMST. 
+\end{theorem}
+\begin{proof} 
+    Por el Lema \ref{lem:exhaustivity4} y por el Lema \ref{lem:factible_dcst4} el algoritmo explora exhaustivamente el espacio de soluciones factibles y conserva el mínimo costo encontrado, garantizando optimalidad.
+\end{proof}
+
 \section{Implementación y Análisis Experimental}
+Se implementaron todos los algoritmos descritos en C++. Los códigos se encuentran detallados en el Apéndice A.
+
 \section{Conclusiones}
+En este trabajo se detalló el análisis y solución del problema DCMST. Se demostró su complejidad NP-Hard y se presentaron cuatro variantes algorítmicas exactas para su resolución.
 
 \newpage
+\appendix
+\section{Apéndice: Implementaciones en C++}
+
+A continuación se presentan las implementaciones completas utilizadas en el estudio.
+
+\subsection{Solución 1: Fuerza Bruta con Máscara de Bits} \label{sec:code_bitmask}
+\lstinputlisting[
+    language=C++
+]{../src/bitmask.cpp}
+
+
+\subsection{Solución 2: Generación Combinatoria Lexicográfica} \label{sec:code_comb}
+\lstinputlisting[
+    language=C++
+]{../src/comb.cpp}
+
+\subsection{Solución 3: Código de Gray Iterativo} \label{sec:code_gray_iter}
+\lstinputlisting[
+    language=C++
+]{../src/gray_iterative.cpp}
+
+
+\subsection{Solución 4: Código de Gray Recursivo con Poda} \label{sec:code_gray_rec}
+\lstinputlisting[
+    language=C++
+]{../src/gray_recursive.cpp}
 
 \begin{thebibliography}{9}
 \bibitem{clrs} 
