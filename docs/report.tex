@@ -409,8 +409,6 @@ A continuación se presenta dos algoritmos exactos para el DCMST basados en la e
 El código de Gray constituye una secuencia de representaciones binarias tal que dos códigos consecutivos difieren exactamente en un solo bit. Formalmente, el código Gray de un entero $n$ se define como:
 $$G(n) = n \oplus (n>>1)$$
 
-
-
 Una técnica para generar todas las combinaciones de tamaño $K$ consiste en generar la secuencia completa de códigos Gray para los enteros desde $0$ hasta $2^N - 1$ y filtrar únicamente aquellas máscaras que contienen exactamente $K$ bits activos. Un resultado fundamental es que, en la secuencia filtrada, dos combinaciones adyacentes (consideradas en sentido cíclico) difieren exactamente en dos bits, lo que equivale a eliminar un elemento y añadir otro.
 
 Esta propiedad puede demostrarse por inducción utilizando la construcción recursiva del código Gray:
@@ -473,7 +471,22 @@ Las ramas que violan la restricción de grado se podan anticipadamente.
     El algoritmo genera exactamente todas las combinaciones de $n-1$ aristas sin repetición. 
 \end{lemma}
 \begin{proof} 
-    La recurrencia $G(N,K)$ genera todas las combinaciones binarias de longitud $N$ con exactamente $K$ bits activos, sin duplicados, por construcción inductiva. 
+    Procedemos por inducción fuerte sobre $N$, la longitud de la cadena binaria (número total de aristas disponibles).
+
+    \textbf{Caso base:} Para $N=0$ , $G(0,0)=\{\epsilon\}$, que representa la única combinación de $0$ aristas. Para $K>0$, $G(0,K)=\emptyset$, correctamente generando ninguna combinación.
+
+    \textbf{Hipótesis inductiva:} Supongamos que para todo $n' < N$, $G(n',K)$  genera exhaustiva y sin repeticiones todas las combinaciones binarias de longitud $n'$ con exactamente $K$ bits activos.
+
+    \textbf{Paso inductivo:} Para $G(N,K)$, consideremos cualquier combinación válida $s$ de longitud $N$ con $K$ bits $1$. Examinamos su primer bit:
+
+    \begin{itemize}
+        \item Si $s_1=0$, entonces el sufijo $s_{2..N}$ es una combinación válida de longitud $N-1$ con $K$ bits $1$. Por hipótesis, aparece en $G(N'1,K)$, luego $0s_{2..N}$ aparece en $0G(N-1,K)$.
+        \item Si $s_1=1$, entonces $s_{2..N}$ tiene $K-1$ bits $1$. Por hipótesis, aparece en $G(N-1,K-1)$, luego $1s_{2..N}$ aparece en $1G(N-1,K-1)^R$.
+    \end{itemize}
+
+    La unión disjunta $\cup$ de ambos conjuntos cubre todas las posibilidades sin superposición, pues difieren en su primer bit.
+
+    Por tanto, $G(N,K)$ genera exactamente todas las combinaciones buscadas, sin duplicados.
 \end{proof}
 
 \begin{lemma}\label{lem:factible_dcst4}
