@@ -6,10 +6,12 @@ docs/report.out
 docs/report.synctex.gz
 docs/report.toc
 
-src/generator
-src/comb
-src/bitmask
-src/gray_recursive
-src/gray_iterative
+generator
+comb
+bitmask
+gray_recursive
+gray_iterative
+ant_colony
+evolutionary
 
 src/bin/*
