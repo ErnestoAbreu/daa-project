@@ -88,8 +88,12 @@
 \tableofcontents
 \newpage
 
+
+
+
 \section{Formalización del Problema}
-Partiendo de la necesidad de interconectar los edificios de la universidad minimizando costos y respetando la capacidad de puertos de ETECSA, definimos el modelo matemático.
+Partiendo de la necesidad de interconectar los edificios de la universidad minimizando costos y respetando la capacidad 
+de puertos de ETECSA, definimos el modelo matemático.
 
 \subsection{Modelo Matemático}
 Sea $G = (V, E)$ un grafo conexo y no dirigido, donde:
@@ -114,7 +118,8 @@ Este problema es conocido como \textit{Degree-Constrained Minimum Spanning Tree}
 
 \subsection{Variantes del Problema}
 
-Analicemos algunas variantes, las cuales surgen a partir de diferentes supuestos sobre la estructura del grafo y las restricciones de grado.
+Analicemos algunas variantes, las cuales surgen a partir de diferentes supuestos sobre la estructura del grafo y las 
+restricciones de grado.
 
 \subsubsection{DCMST en grafos completos}
 
@@ -127,8 +132,9 @@ donde
 E = \{ \{u,v\} \mid u,v \in V,\; u \neq v \}.
 \]
 
-Este modelo se ajusta bien al problema original, dado que de no existir una conexión original entre dos vértices (porque sea imposible conectar dos edificios),
-puedes asignar un costo \textit{infinito} a dicha arista, asegurando que no será seleccionada en la solución óptima. De ser seleccionada representaría que no se encontró solución factible.
+Este modelo se ajusta bien al problema original, dado que de no existir una conexión original entre dos vértices 
+(porque sea imposible conectar dos edificios), puedes asignar un costo \textit{infinito} a dicha arista, asegurando 
+que no será seleccionada en la solución óptima. De ser seleccionada representaría que no se encontró solución factible.
 
 
 Analizando la complejidad temporal, el carácter completo del grafo incrementa significativamente el número de aristas al peor caso,
@@ -138,7 +144,8 @@ Analizando la complejidad temporal, el carácter completo del grafo incrementa s
 
 \subsubsection{DCMST con restricción de grado uniforme}
 
-Otra variante ampliamente estudiada es aquella en la que el límite de grado es uniforme para todos los vértices del grafo. En este caso, se fija un valor entero constante \( K \geq 2 \) tal que
+Otra variante ampliamente estudiada es aquella en la que el límite de grado es uniforme para todos los vértices del grafo. 
+En este caso, se fija un valor entero constante \( K \geq 2 \) tal que
 \[
 \deg_T(v) \leq K \quad \forall v \in V,
 \]
@@ -146,36 +153,112 @@ donde \( \deg_T(v) \) denota el grado del vértice \( v \) en el árbol generado
 
 Esta formulación es adecuada en el caso en que el equipamiento de red sea el mismo para todos los edificios.
 
-Además si tomamos \( K = \min_{v \in V} k(v) \), una solución optima de esta instancia es una solución factible. aunque no necesariamente óptima, para la instancia del problema original .
+Además si tomamos \( K = \min_{v \in V} k(v) \), una solución optima de esta instancia es una solución factible, 
+aunque no necesariamente óptima, para la instancia del problema original.
 
 \subsubsection{Degree-Constrained Spanning Tree (DCST)}
 
-Una variante adicional es el problema Degree-Constrained Spanning Tree. En esta versión, el objetivo no consiste en minimizar el peso total del árbol, sino únicamente en determinar la existencia de un árbol generador que satisfaga las restricciones estructurales.
+Una variante adicional es el problema Degree-Constrained Spanning Tree. En esta versión, el objetivo no consiste en 
+minimizar el peso total del árbol, sino únicamente en determinar la existencia de un árbol generador que satisfaga las 
+restricciones estructurales.
 
-Este problema puede ser formulado como un problema de decisión o factibilidad. A pesar de la ausencia de una función objetivo de optimización, la determinación de la existencia de una solución válida sigue siendo computacionalmente difícil en el caso general. Esta variante resulta de interés teórico y se emplea frecuentemente como base para el estudio de la complejidad del DCMST y el diseño de algoritmos exactos y aproximados.
+Este problema puede ser formulado como un problema de decisión o factibilidad. A pesar de la ausencia de una función 
+objetivo de optimización, la determinación de la existencia de una solución válida sigue siendo computacionalmente 
+difícil en el caso general. Esta variante resulta de interés teórico y se emplea frecuentemente como base para el 
+estudio de la complejidad del DCMST y el diseño de algoritmos exactos y aproximados.
 
 \vspace{1em}
 
-En la siguiente sección, se analizará la complejidad computacional del DCMST y sus variantes. En la experimentación nos enfocaremos principalmente analizando DCMST en grafos completos con restricción de grado uniforme por los beneficios planteados anteriormente.
+En la siguiente sección, se analizará la complejidad computacional del DCMST y sus variantes. En la experimentación nos 
+enfocaremos principalmente analizando DCMST en grafos completos con restricción de grado uniforme por los beneficios 
+planteados anteriormente.
+
+
 
 
 \section{Análisis de Complejidad Computacional}
-\subsection{Demostración de NP-Hardness}
-Para demostrar que el problema es NP-Hard, realizamos una reducción desde el problema \textit{Hamiltonian Path}, un conocido problema NP-Completo. 
+
+\subsection{Demostración de NP-Hardness del problema DCMST}
+
+Para analizar la complejidad computacional del problema, demostramos que dicho problema es NP-Hard mediante una reducción 
+polinomial desde el problema del Viajante de Comercio (\textit{Traveling Salesman Problem}, TSP), uno de los problemas 
+clásicos NP-Hard.
 
 \begin{theorem}
-El problema DCMST es NP-Hard.
+El problema Degree-Constrained Minimum Spanning Tree es NP-Hard.
 \end{theorem}
+
 \begin{proof}
-Dada una instancia del problema \textit{Hamiltonian Path}, construimos una instancia del problema DCMST donde cada vértice tiene grado máximo 2. Si existe un árbol de expansión que cumpla las restricciones de grado, entonces tenemos un camino de Hamilton del grafo original.
+Consideremos una instancia arbitraria del problema del Viajante. Dicha instancia está definida por un grafo completo no dirigido
+\[
+G = (V, E),
+\]
+junto con una función de costos \( w: E \rightarrow \mathbb{R}^+ \). El objetivo del TSP es encontrar un ciclo simple de costo 
+mínimo que visite exactamente una vez cada vértice. Un ciclo simple que cubre todos los vértices es conocido como ciclo hamiltoniano.
 
+A partir de esta instancia, construimos una instancia del problema DCMST de la siguiente manera:
+\begin{itemize}
+    \item Obtenemos el mismo grafo \( G = (V, E) \) y la misma función de costos \( w \).
+    \item Sea \(v\) un vértice cualquiera de \(G\)
+    \item Dividimos \(v\) en dos vértices \(v_1\) y \(v_2\), tal que \(k(v_1) = 1 \) y \(k(v_2) = 1\).
+    \item Asignamos restricciones de grado \( k(u) = 2 \) para todo \( u \in V \setminus \{v_1 , v_2\} \).
+\end{itemize}
 
+Observemos que, bajo esta restricción, cualquier árbol de expansión válido \( T \) debe satisfacer
+\[
+\deg_T(v) \leq 2 \quad \forall v \in V.
+\]
+Un árbol de expansión con grado máximo 2 en todos los vértices es necesariamente un camino simple que cubre todos los vértices del grafo.
+En todo camino simple, los vértices extremos tienen grado 1 y los vértices intermedios tienen grado 2.
 
-Si supiéramos resolver DCMST en tiempo polinomial, podríamos resolver \textit{Hamiltonian Path} en tiempo polinomial. Por lo tanto, DCMST es NP-Hard.
+Si resolvemos esta instancia, obtenemos un árbol de expansión \( T^* \) de costo mínimo que cumple con las restricciones. Por lo que 
+el árbol va a ser de la forma \[ v_1 - u_1 - u_2 - \ldots - u_{|V|-2} - v_2 \], donde \( u_i \in V \setminus \{v_1 , v_2\} \).
+
+\begin{lemma}
+    El árbol de expansión \( T^* \) obtenido en la instancia del DCMST corresponde a un ciclo hamiltoniano de costo mínimo en la instancia original del TSP.
+\end{lemma}
+
+\begin{proof}
+    Dado el árbol \( T^* \), notese que si unimos nuevamente \(v_1\) y \(v_2\) como un solo vértice \(v\), obtenemos un ciclo hamiltoniano \(C^*\) en el grafo original \(G\) con costo igual al del árbol \(T^*\).
+    Supongamos que existe un ciclo hamiltoniano \( C \) en \( G \) con costo menor que el costo de \( T^* \). Al dividir el vértice \(v\)
+    en dos vértices \(v_1\) y \(v_2\), el ciclo \( C \) se transforma en un camino simple que cubre todos los vértices de la instancia del DCMST,
+    obteniendose un árbol de expansión \(T'\) con costo menor que \( T^* \), lo cual es una contradicción ya que \( T^* \) es el de costo mínimo.
+
+    Por reducción al absurdo, concluimos que \( C^* \) es un ciclo hamiltoniano de costo mínimo en la instancia original del TSP.
 \end{proof}
 
-\subsection{Degree-Constrained Spanning Tree}
-El problema de decisión Degree-Constrained Spanning Tree (DCST), en el cual queremos saber si existe un árbol de expansión que cumpla con las restricciones de grado, es NP-Completo. Ya que es fácil verificar que un árbol dado es de expansión de $G$ y cumple con las restricciones de grado en tiempo polinomial.
+Dado que todas las transformaciones realizadas son polinomiales en tiempo, tener una solución de DCMST en tiempo polinomial nos permite resolver cualquier instancia del TSP 
+en tiempo polinomial. Por tanto DCMST es al menos tan difícil como TSP.
+
+Por lo tanto, el problema DCMST es NP-Hard.
+\end{proof}
+
+\subsection{NP-Completitud del problema Degree-Constrained Spanning Tree}
+
+Consideremos ahora la versión de decisión del problema, conocida como Degree-Constrained Spanning Tree (DCST), en la cual se pregunta si existe un árbol de expansión que satisfaga un conjunto dado de restricciones de grado, sin considerar una función de costo.
+
+\begin{theorem}
+El problema Degree-Constrained Spanning Tree (DCST) es NP-Completo.
+\end{theorem}
+
+\begin{proof}
+En primer lugar, observemos que DCST pertenece a la clase NP. En efecto, dada una solución candidata \( T = (V, E') \), es posible verificar en tiempo polinomial que:
+\begin{itemize}
+    \item \( T \) es conexo y acíclico,
+    \item \( |E'| = |V| - 1 \),
+    \item \( \deg_T(v) \leq k(v) \) para todo \( v \in V \).
+\end{itemize}
+
+A continuación, demostramos que DCST es NP-Hard mediante una reducción polinomial desde el problema \textit{Hamiltonian Path}, el cual es NP-Completo.
+
+Sea \( G = (V, E) \) una instancia arbitraria del problema Hamiltonian Path. Construimos una instancia del problema DCST sobre el mismo grafo \( G \), imponiendo una restricción de grado uniforme \( k(v) = 2 \) para todo vértice \( v \in V \).
+
+Bajo esta restricción, cualquier árbol de expansión factible debe tener grado a lo sumo 2 en cada vértice. Como consecuencia, dicho árbol solo puede ser un camino simple que cubra todos los vértices del grafo, es decir, un camino hamiltoniano.
+
+Por tanto, existe un árbol de expansión que satisface las restricciones de grado si y solo si existe un camino hamiltoniano en el grafo original. La reducción es claramente polinomial.
+
+Dado que DCST es NP-Hard y pertenece a NP, se concluye que el problema DCST es NP-Completo.
+\end{proof}
 
 \section{Diseño de Soluciones Algorítmicas}
 Se desarrollaron e implementaron cuatro enfoques principales. El código fuente completo de cada implementación se encuentra en el Apéndice A.
