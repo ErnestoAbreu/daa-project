@@ -8,7 +8,7 @@ The main problem is defined at [problem description](docs/problem.md).
 
 ### Problem Formalization
 
-Let $G = (V, E)$ be a complete, weighted, and undirected graph. We define a cost function $w: E \to \mathbb{R}^+$ for each edge and a capacity function $k: V \to \mathbb{N}$ representing the maximum allowed degree (available ports) for each vertex $v \in V$.
+Let $G = (V, E)$ be a conected, weighted, and undirected graph. We define a cost function $w: E \to \mathbb{R}^+$ for each edge and a capacity function $k: V \to \mathbb{N}$ representing the maximum allowed degree (available ports) for each vertex $v \in V$.
 
 The goal is to find a spanning tree $T = (V, E')$ that minimizes the total installation cost:
 
@@ -29,7 +29,7 @@ Not implemented yet
 ## 📁 Repository Structure
 
 * `/docs`: Formal LaTeX report including the NP-Hardness proof and algorithm analysis.
-* `/src`: C++ source files.
+* `/src`: C++/Python source files.
 
 ## 🎓 Authors
 

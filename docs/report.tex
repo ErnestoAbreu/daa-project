@@ -112,6 +112,51 @@ Sujeto a:
 
 Este problema es conocido como \textit{Degree-Constrained Minimum Spanning Tree} (DCMST).
 
+\subsection{Variantes del Problema}
+
+Analicemos algunas variantes, las cuales surgen a partir de diferentes supuestos sobre la estructura del grafo y las restricciones de grado.
+
+\subsubsection{DCMST en grafos completos}
+
+Una variante relevante del DCMST es aquella en la que el grafo se asume completo. Formalmente, se considera un grafo no dirigido
+\[
+G = (V, E),
+\]
+donde
+\[
+E = \{ \{u,v\} \mid u,v \in V,\; u \neq v \}.
+\]
+
+Este modelo se ajusta bien al problema original, dado que de no existir una conexión original entre dos vértices (porque sea imposible conectar dos edificios),
+puedes asignar un costo \textit{infinito} a dicha arista, asegurando que no será seleccionada en la solución óptima. De ser seleccionada representaría que no se encontró solución factible.
+
+
+Analizando la complejidad temporal, el carácter completo del grafo incrementa significativamente el número de aristas al peor caso,
+\[
+|E| = \frac{|V|(|V|-1)}{2} = O(|V|^2).
+\]
+
+\subsubsection{DCMST con restricción de grado uniforme}
+
+Otra variante ampliamente estudiada es aquella en la que el límite de grado es uniforme para todos los vértices del grafo. En este caso, se fija un valor entero constante \( K \geq 2 \) tal que
+\[
+\deg_T(v) \leq K \quad \forall v \in V,
+\]
+donde \( \deg_T(v) \) denota el grado del vértice \( v \) en el árbol generador \( T \).
+
+Esta formulación es adecuada en el caso en que el equipamiento de red sea el mismo para todos los edificios.
+
+Además si tomamos \( K = \min_{v \in V} k(v) \), una solución optima de esta instancia es una solución factible. aunque no necesariamente óptima, para la instancia del problema original .
+
+\subsubsection{Degree-Constrained Spanning Tree (DCST)}
+
+Una variante adicional es el problema Degree-Constrained Spanning Tree. En esta versión, el objetivo no consiste en minimizar el peso total del árbol, sino únicamente en determinar la existencia de un árbol generador que satisfaga las restricciones estructurales.
+
+Este problema puede ser formulado como un problema de decisión o factibilidad. A pesar de la ausencia de una función objetivo de optimización, la determinación de la existencia de una solución válida sigue siendo computacionalmente difícil en el caso general. Esta variante resulta de interés teórico y se emplea frecuentemente como base para el estudio de la complejidad del DCMST y el diseño de algoritmos exactos y aproximados.
+
+\vspace{1em}
+
+En la siguiente sección, se analizará la complejidad computacional del DCMST y sus variantes. En la experimentación nos enfocaremos principalmente analizando DCMST en grafos completos con restricción de grado uniforme por los beneficios planteados anteriormente.
 
 
 \section{Análisis de Complejidad Computacional}
@@ -369,24 +414,24 @@ A continuación se presentan las implementaciones completas utilizadas en el est
 \subsection{Solución 1: Fuerza Bruta con Máscara de Bits} \label{sec:code_bitmask}
 \lstinputlisting[
     language=C++
-]{../src/bitmask.cpp}
+]{../src/solutions/bitmask.cpp}
 
 
 \subsection{Solución 2: Generación Combinatoria Lexicográfica} \label{sec:code_comb}
 \lstinputlisting[
     language=C++
-]{../src/comb.cpp}
+]{../src/solutions/comb.cpp}
 
 \subsection{Solución 3: Código de Gray Iterativo} \label{sec:code_gray_iter}
 \lstinputlisting[
     language=C++
-]{../src/gray_iterative.cpp}
+]{../src/solutions/gray_iterative.cpp}
 
 
 \subsection{Solución 4: Código de Gray Recursivo con Poda} \label{sec:code_gray_rec}
 \lstinputlisting[
     language=C++
-]{../src/gray_recursive.cpp}
+]{../src/solutions/gray_recursive.cpp}
 
 \begin{thebibliography}{9}
 \bibitem{clrs} 
