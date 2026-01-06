@@ -175,6 +175,76 @@ El número total de máscaras es $2^m$, pero las máscaras consideradas efectiva
 
 Por tanto, el costo por máscara es $O(n)$ y la complejidad total es: $O(2^m + \binom{m}{n-1} \cdot n)$.
 
+
+\subsection{Enumeración Lexicográfica para el DCMST}
+
+El algoritmo se basa en la enumeración exhaustiva de subconjuntos de aristas mediante una representación binaria y generación lexicográfica de combinaciones. Su aplicabilidad es sobre todo para instancias de tamaño reducido y es aplicable como algoritmo de referencia para la validación de metaheurísticas.
+
+\subsubsection{Descripción del Algoritmo}
+
+Sea $G = (V,E)$ un grafo completo con $|V| = n$ vértices y $|E| = m = \frac{n(n-1)}{2}$ aristas. El algoritmo procede como sigue:
+
+\begin{enumerate} 
+    \item Se indexan todas las aristas de $E$. 
+    \item Se construye una cadena binaria \texttt{state} de longitud $m$ con exactamente $n-1$ bits activos. 
+    \item Cada permutación lexicográfica de \texttt{state} representa un subconjunto distinto de $n-1$ aristas. 
+    \item Para cada subconjunto: 
+    \begin{itemize} 
+        \item Se construye el subgrafo inducido. 
+        \item Se verifica la restricción de grado. 
+        \item Se comprueba conectividad mediante DFS. 
+        \item Si es factible, se evalúa su costo. 
+    \end{itemize} 
+    \item Se devuelve el mínimo costo encontrado. 
+\end{enumerate}
+
+La generación de subconjuntos se realiza mediante la función \texttt{next\_permutation}, lo que garantiza que cada combinación se visita exactamente una vez.
+
+\subsubsection{Análisis de Correctitud}
+
+\begin{lemma}\label{lem:exhaustivity2}
+    El algoritmo enumera todos los subconjuntos de aristas de tamaño $n-1$.
+\end{lemma}
+\begin{proof}
+    La cadena binaria inicial contiene exactamente $n-1$ unos y $m-(n-1)$ ceros. El uso de \texttt{next\_permutation} genera todas las permutaciones distintas de dicha cadena, que corresponden biyectivamente a los subconjuntos de $E$ con $n-1$ elementos.
+\end{proof}
+
+\begin{lemma}\label{lem:factible_dcst2}
+    Un subconjunto $E' \subseteq E$ con $|E'|=n-1$ es un árbol generador factible si y solo si: 
+    \begin{enumerate} 
+        \item El subgrafo inducido es conexo. 
+        \item Para todo $v \in V$, $\deg(v) \leq k$. 
+    \end{enumerate}
+\end{lemma}
+\begin{proof}
+    Un grafo conexo con $n-1$ aristas es un árbol. La segunda condición garantiza la restricción de grado. Ambas son necesarias y suficientes.
+\end{proof}
+
+\begin{lemma}
+    La función \texttt{check} devuelve verdadero si y solo si el subgrafo inducido por la máscara es un árbol generador factible.
+\end{lemma}
+\begin{proof}
+    Inicialmente, verifica que ningún vértice tenga grado mayor que $k$. Luego, ejecuta un DFS desde el vértice $0$ y comprueba que todos los vértices son alcanzables, lo que implica conectividad. Por el Lema \ref{lem:factible_dcst2}, esto es equivalente a ser un DCST factible.
+\end{proof}
+
+\begin{theorem}
+    El algoritmo devuelve el costo mínimo entre todos los árboles generadores que satisfacen la restricción de grado.    
+\end{theorem}
+\begin{proof}
+    Por el Lema \ref{lem:exhaustivity2}, todas las soluciones candidatas son evaluadas. Por el Lema \ref{lem:factible_dcst2}, se aceptan exactamente las factibles. El algoritmo selecciona el mínimo costo entre ellas, lo que implica optimalidad.
+\end{proof}
+
+\subsubsection{Análisis de Complejidad}
+
+El número de combinaciones evaluadas es: $\binom{m}{n-1}$ y para cada combinación:
+\begin{itemize} 
+    \item Construcción del subgrafo: $O(n)$. 
+    \item Verificación de grados: $O(n)$. 
+    \item DFS de conectividad: $O(n)$. 
+\end{itemize}
+
+Por lo tanto, la complejidad es $O(\binom{m}{n-1} \cdot n)$.
+
 \section{Implementación y Análisis Experimental}
 \section{Conclusiones}
 
