@@ -70,9 +70,9 @@
 % --- Título y Autores ---
 \title{\textbf{Optimización de Red de Fibra Óptica \\ (Degree-Constrained Minimum Spanning Tree)}}
 
-\author[1]{Ernesto Abreu Peraza}
-\author[1]{Eduardo Brito Labrada}
-\affil[1]{Diseño y Análisis de Algoritmos - Universidad de La Habana}
+\author{Ernesto Abreu Peraza}
+\author{Eduardo Brito Labrada}
+\affil{Diseño y Análisis de Algoritmos - Universidad de La Habana}
 
 \date{\today}
 
@@ -81,7 +81,8 @@
 \maketitle
 
 \begin{abstract}
-\noindent Este informe detalla el análisis y la solución al problema del Árbol de Expansión Mínimo con Grado Restringido (DCMST) para la infraestructura de red de la Universidad de La Habana. Se presenta la formalización matemática, la demostración de su complejidad NP-Hard y una comparativa experimental entre diferentes algoritmos implementados en C++.
+\noindent Este informe detalla el análisis e implementa soluciones al conocido problema NP-Hard Degree Constrained Minimum Spanning Tree para la infraestructura de red de la Universidad de La Habana. 
+Se presenta la formalización matemática, la demostración de su complejidad computacional y una comparativa experimental entre diferentes algoritmos.
 \end{abstract}
 
 \newpage
@@ -89,6 +90,15 @@
 \newpage
 
 
+\section{Introducción}
+
+El diseño eficiente de redes de comunicación constituye un problema fundamental en múltiples dominios de la ingeniería y las ciencias de la computación, particularmente en el contexto de infraestructuras físicas como redes de fibra óptica. En estos escenarios, no solo resulta relevante minimizar el costo total de interconexión, sino también respetar restricciones técnicas impuestas por el equipamiento disponible, tales como el número máximo de conexiones que puede soportar cada nodo de la red.
+
+El problema del Árbol de Expansión Mínimo con Restricciones de Grado (\textit{Degree-Constrained Minimum Spanning Tree}, DCMST) surge de manera natural al modelar este tipo de situaciones. A diferencia del problema clásico del Árbol de Expansión Mínimo (MST), el DCMST impone cotas superiores al grado de cada vértice, lo cual incrementa significativamente su complejidad computacional. De hecho, el DCMST es un problema NP-Hard, lo que implica que, salvo que \( \text{P} = \text{NP} \), no existen algoritmos que lo resuelvan de manera eficiente para grandes instancias.
+
+Motivado por el problema definido en este \href{https://github.com/ErnestoAbreu/daa-project/blob/main/docs/problem.md}{documento}, se realiza una formalización matemática rigurosa del problema, se analizan y se demuestra su complejidad computacional.
+
+Adicionalmente, se diseñan e implementan varios algoritmos y se presenta un análisis experimental que permite comparar el comportamiento de las distintas estrategias implementadas.
 
 
 \section{Formalización del Problema}
@@ -172,8 +182,6 @@ estudio de la complejidad del DCMST y el diseño de algoritmos exactos y aproxim
 En la siguiente sección, se analizará la complejidad computacional del DCMST y sus variantes. En la experimentación nos 
 enfocaremos principalmente analizando DCMST en grafos completos con restricción de grado uniforme por los beneficios 
 planteados anteriormente.
-
-
 
 
 \section{Análisis de Complejidad Computacional}
@@ -482,8 +490,43 @@ Las ramas que violan la restricción de grado se podan anticipadamente.
     Por el Lema \ref{lem:exhaustivity4} y por el Lema \ref{lem:factible_dcst4} el algoritmo explora exhaustivamente el espacio de soluciones factibles y conserva el mínimo costo encontrado, garantizando optimalidad.
 \end{proof}
 
-\section{Implementación y Análisis Experimental}
-Se implementaron todos los algoritmos descritos en C++. Los códigos se encuentran detallados en el Apéndice A.
+\section{Análisis Experimental}
+
+\subsection{Implementación}
+
+Con el objetivo de evaluar los algoritmos propuestos para la resolución del problema DCMST, se implementaron todas las soluciones descritas en la sección anterior 
+utilizando el lenguaje de programación \texttt{C++}. La elección de este lenguaje se debe a su eficiencia, amplia disponibilidad de estructuras de datos de bajo 
+nivel y la experiencia de los autores en el mismo, lo cual hace mas sencilla la implementación de algoritmos.
+
+\subsection{Intancias de Prueba}
+
+Las instancias de prueba utilizadas corresponden a grafos completos de distintos tamaños representados en matriz de adyacencia ponderada.
+
+Cada instancia tiene el siguiente formato:
+\begin{itemize}
+    \item La primera línea contiene dos enteros: \( n \) (número de vértices) y \( k \) (restricción de grado para todo vértice).
+    \item Las siguientes \( n \) líneas contienen \( n \) enteros cada una, representando la matriz de costos entre los vértices.
+    \item Se garantiza que la matriz es simétrica y que los valores en la diagonal son cero.
+\end{itemize}
+
+\subsection{Experimentación}
+
+Para cada instancia se evaluó el costo mínimo encontrado, así como el tiempo de ejecución de cada algoritmo, permitiendo comparar su desempeño relativo.
+
+El propósito principal de este análisis experimental no es demostrar escalabilidad, sino:
+\begin{itemize}
+    \item Validar la correctitud de las implementaciones.
+    \item Comparar el impacto de distintas estrategias sobre el tiempo de ejecución.
+\end{itemize}
+
+\subsection{Resultados}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\textwidth]{../src/resultados.png}
+    \caption{Resultados experimentales: comparación de costos y tiempos entre los algoritmos implementados.}
+    \label{fig:resultados}
+\end{figure}
 
 \section{Conclusiones}
 En este trabajo se detalló el análisis y solución del problema DCMST. Se demostró su complejidad NP-Hard y se presentaron cuatro variantes algorítmicas exactas para su resolución.
