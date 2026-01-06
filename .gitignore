@@ -12,4 +12,4 @@ src/bitmask
 src/gray_recursive
 src/gray_iterative
 
-src/solutions/*.exe
+src/bin/*

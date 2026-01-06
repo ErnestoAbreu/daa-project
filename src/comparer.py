@@ -5,7 +5,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 
 TESTS_DIR = "tests"
-SOLUTIONS_DIR = "solutions"
+BIN_DIR = "bin"
 TIMEOUT = 60  # segundos
 OUTPUT_IMAGE = "resultados.png"
 
@@ -57,7 +57,7 @@ def main():
         f for f in os.listdir(TESTS_DIR) if f.endswith(".txt")
     )
     executables = sorted(
-        f for f in os.listdir(SOLUTIONS_DIR) if not f.endswith(".cpp") 
+        f for f in os.listdir(BIN_DIR) if not f.endswith(".cpp") 
     )
 
     for test_file in test_files:
@@ -65,7 +65,7 @@ def main():
             input_data = f.read()
 
         for exe in executables:
-            exe_path = os.path.join(SOLUTIONS_DIR, exe)
+            exe_path = os.path.join(BIN_DIR, exe)
 
             output, exec_time = run_executable(exe_path, input_data)
 
