@@ -18,6 +18,7 @@
 \DeclareMathOperator*{\argmin}{arg\,min}
 \newtheorem{definition}{Definición}
 \newtheorem{theorem}{Teorema}
+\newtheorem{lemma}[theorem]{Lema}    % Lemma shares counter with theorem
 
 % --- Configuración para Código C++ ---
 \definecolor{codegreen}{rgb}{0,0.6,0}
@@ -33,6 +34,9 @@
     numbers=left,
     numberstyle=\tiny\color{codegray}
 }
+
+\usepackage{amsthm} % Load the theorem package
+
 
 % --- Información del Proyecto ---
 \title{Optimización de Red de Fibra Óptica \\ (Degree-Constrained Minimum Spanning Tree) \\ \large Diseño y Análisis de Algoritmos - Universidad de La Habana}
@@ -96,6 +100,81 @@ El problema de decisión Degree-Constrained Spanning Tree (DCST), en el cual que
 Ya que es fácil verificar que un árbol dado es de expansión de $G$ y cumple con las restricciones de grado en tiempo polinomial.
 
 \section{Diseño de Soluciones Algorítmicas}
+
+\subsection{Enumeración con Máscara de Bits para el DCMST}
+
+Esta es una solución exacta para el problema DCMST basada en \textbf{enumeración exhaustiva mediante máscara de bits}. Esta solución está diseñada para instancias de tamaño pequeño, sirviendo como algoritmo de referencia y verificación de metaheurísticas.
+
+El algoritmo explora todos los subconjuntos posibles de aristas que contienen exactamente $|V| - 1$ aristas y verifica cuáles inducen un árbol generador que cumple con la restricción de grado. Entre todas las soluciones factibles, selecciona la de costo mínimo.
+
+\subsubsection{Descripción del Algoritmo}
+
+Sea $G = (V, E)$ un grafo completo, no dirigido y ponderado, con $|V| = n$ vértices y $|E| = m = \dfrac{n(n-1)}{2}$ aristas. El algoritmo procede de la siguiente manera:
+
+\begin{enumerate}
+    \item Se enumeran todas las aristas $E$ y se indexan de $0$ a $m-1$.
+    \item Se recorre cada máscara de bits $mask \in \{0,1\}^m$.
+    \item Solo se consideran las máscaras cuyo número de bits activos es exactamente $n-1$.
+    \item Cada máscara define un subgrafo $G_{mask}$ compuesto por las aristas seleccionadas.
+    \item Se verifica si:
+    \begin{itemize}
+        \item El subgrafo es conexo (usando Depth-First Search).
+        \item El grado de cada vértice es a lo sumo $k$.
+    \end{itemize}
+    \item Si ambas condiciones se cumplen, el sugrafo es un árbol generador factible y se evalúa su costo.
+    \item Se devuelve el mínimo costo entre todas las soluciones factibles.
+\end{enumerate}
+
+El uso de una máscara de bits permite representar subconjuntos de aristas de forma compacta y eficiente a nivel de implementación.
+
+\subsubsection{Análisis de Correctitud}
+
+Demostraremos que el algoritmo es correcto, es decir, que devuelve exactamente el costo del árbol generador mínimo con restricción de grado.
+
+\begin{lemma}\label{lem:exhaustivity1}
+    El algoritmo examina \textbf{todos} los subconjuntos de aristas de tamaño $n-1$.
+\end{lemma}
+\begin{proof}
+    Cada máscara de bits $m$ representa un subconjunto único de aristas. Al iterar sobre todas las máscaras
+    con $\text{popcount(mask)} = n-1$, se enumeran exactamente todos los subconjuntos de $E$ con $n-1$ aristas.
+\end{proof}
+
+\begin{lemma}\label{lem:factible_dcst1}
+    Un subconjunto de aristas $E' \subseteq E$ con $|E'| = n-1$ es un árbol generador factible si y solo si:
+    \begin{enumerate}
+        \item El grafo inducido es conexo.
+        \item Para todo vértice $v$, $\text{deg}(v) \le k$.
+    \end{enumerate}
+\end{lemma}
+\begin{proof}
+    Un grafo conexo con $n-1$ aristas es un árbol. La segunda condición garantiza la restricción de grado. Por lo tanto, ambas condiciones son necesarias y suficientes. 
+\end{proof}
+
+\begin{lemma}
+    La función \texttt{check} devuelve verdadero si y solo si el subgrafo inducido por la máscara es un árbol generador factible.
+\end{lemma}
+\begin{proof}
+    Inicialmente, verifica que ningún vértice tenga grado mayor que $k$. Luego, ejecuta un DFS desde el vértice $0$ y comprueba que todos los vértices son alcanzables, lo que implica conectividad. Por el Lema \ref{lem:factible_dcst1}, esto es equivalente a ser un DCST factible.
+\end{proof}
+
+\begin{theorem}
+    El algoritmo devuelve el costo mínimo entre todos los árboles generadores que cumplen la restricción de grado.
+\end{theorem}
+\begin{proof}
+    Por el Lema \ref{lem:exhaustivity1}, el algoritmo considera todas las soluciones candidatas. Por el Lema \ref{lem:factible_dcst}, acepta exactamente las soluciones factibles. Finalmente, toma el mínimo costo entre ellas. Por lo tanto, el resultado es óptimo.
+\end{proof}
+
+\subsubsection{Análisis de Complejidad}
+
+El número total de máscaras es $2^m$, pero las máscaras consideradas efectivamente son $\binom{m}{n-1}$ y por cada una de ellas se hace lo siguiente:
+\begin{itemize}
+    \item Construcción del subgrafo: $O(n)$.
+    \item Verificación de grados: $O(n)$.
+    \item DFS para conectividad: $O(n)$.
+\end{itemize}
+
+Por tanto, el costo por máscara es $O(n)$ y la complejidad total es: $O(2^m + \binom{m}{n-1} \cdot n)$.
+
 \section{Implementación y Análisis Experimental}
 \section{Conclusiones}
 
