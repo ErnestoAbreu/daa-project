@@ -541,6 +541,59 @@ El propósito principal de este análisis experimental no es demostrar escalabil
     \label{fig:resultados}
 \end{figure}
 
+\section{Diseño de metaheurísticas para resolver el DCMST}
+
+\subsection{Método Primal Aleatorizado (RPM)}
+
+El problema del Árbol de Expansión Mínima con Restricción de Grado (DCMST) busca encontrar un subgrafo $T$ de un grafo ponderado $G=(V, E)$ tal que $T$ sea un árbol que cubra todos los vértices en $V$, minimice la suma de los pesos de las aristas y satisfaga la restricción de que ningún vértice tenga un grado mayor a $d$.
+
+Matemáticamente, buscamos minimizar:
+\begin{equation}
+Z(x) = \sum_{e \in E} w_e x_e
+\end{equation}
+Sujeto a:
+\begin{equation}
+\sum_{e \in \delta(v)} x_e \leq d, \quad \forall v \in V
+\end{equation}
+donde $x_e \in \{0, 1\}$ indica si la arista $e$ está en el árbol, y $\delta(v)$ es el conjunto de aristas incidentes en $v$. A diferencia del MST clásico, el DCMST es un problema NP-hard para $2 \leq d < |V|-1$.
+
+La solución implementada utiliza el \textit{Randomised Primal Method} (RPM). Este enfoque híbrido combina la eficiencia constructiva del algoritmo de Prim con la capacidad de exploración de un Algoritmo Genético (AG).
+
+\subsubsection{Codificación del Cromosoma}
+
+En lugar de codificar aristas directamente (lo cual generaría muchas soluciones infactibles), el RPM utiliza una codificación indirecta. Un cromosoma es una matriz $C$ de dimensiones $n \times (d-1)$, donde $n$ es el número de nodos.
+
+El alelo $C[i][k]$ representa un índice de preferencia. Específicamente, indica que cuando el algoritmo de construcción está considerando el nodo $i$ y este tiene actualmente un grado $k$, debe seleccionar la $C[i][k]$-ésima mejor arista disponible incidente a $i$.
+
+\subsubsection{Decodificación (Algoritmo de Prim Modificado)}
+
+El decodificador construye el árbol iterativamente:
+\begin{enumerate}
+    \item Se inicia con un vértice arbitrario en el árbol $S$.
+    \item En cada paso, se identifican todas las aristas válidas que conectan un nodo $u \in S$ con un nodo $v \notin S$, siempre que $grado(u) < d$.
+    \item Para cada nodo $u \in S$, en lugar de elegir obligatoriamente la arista de menor peso (como en Prim clásico), se consulta el cromosoma. Se selecciona la arista en la posición $C[u][grado\_actual(u)]$ de su lista de adyacencia ordenada.
+    \item De este subconjunto de aristas candidatas seleccionadas por el cromosoma, se elige la de menor peso global para añadirla al árbol.
+\end{enumerate}
+
+\subsubsection{Operadores Genéticos e Inicialización}
+\begin{itemize}
+    \item \textbf{Inicialización Sesgada:} Para asegurar que la búsqueda comience en regiones prometedoras, los alelos no se generan uniformemente. Se utiliza una distribución geométrica (o exponencial negativa discreta) para favorecer valores bajos $(0, 1)$. Esto significa que el algoritmo tiende a comportarse como el algoritmo de Prim (codicioso) con pequeñas perturbaciones estocásticas.
+    \item \textbf{Cruce:} Se implementa un cruce uniforme (\textit{Uniform Crossover}), donde cada gen del hijo se toma de uno de los padres con probabilidad 0.5.
+    \item \textbf{Mutación:} Se aplica una mutación puntual con baja probabilidad, reasignando el valor del gen utilizando la misma distribución geométrica sesgada de la inicialización.
+\end{itemize}
+
+\subsection{Detalles de la Implementación}
+
+La implementación se ha realizado en C++ enfocándose en la eficiencia de las estructuras de datos.
+
+\subsubsection{Estructuras de Datos}
+La clase \texttt{Graph} utiliza listas de adyacencia. Un aspecto crítico para la eficiencia del RPM es que las listas de adyacencia se \textbf{pre-ordenan por peso} al inicio del programa.
+
+Esto permite que el decodificador acceda a la $k$-ésima mejor arista en tiempo constante (o lineal respecto al índice $k$, que suele ser pequeño) sin necesidad de reordenar en cada iteración.
+
+\subsubsection{Manejo de Soluciones Inválidas}
+Dado que las restricciones de grado pueden, en ciertas topologías, llevar a callejones sin salida donde no es posible conectar más nodos sin violar restricciones, el decodificador incluye un mecanismo de seguridad. Si el árbol no logra conectar los $n$ nodos, la solución se marca como \texttt{valid = false} y se le asigna un costo infinito, siendo descartada por el proceso de selección del AG.
+
 \section{Conclusiones}
 En este trabajo se detalló el análisis y solución del problema DCMST. Se demostró su complejidad NP-Hard y se presentaron cuatro variantes algorítmicas exactas para su resolución.
 
