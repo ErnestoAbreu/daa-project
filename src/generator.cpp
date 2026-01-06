@@ -10,7 +10,10 @@ int main(int argc, char* argv[])
     string mode = argv[1];
     
     int V, K;
-    if (mode == "small") {
+    if (mode == "fixed") {
+        V = atoi(argv[2]);
+        K = atoi(argv[3]);
+    } else if (mode == "small") {
         V = rnd.next(1, 6);
         K = rnd.next(1, max(1, V - 1));
     } else if (mode == "medium") {
