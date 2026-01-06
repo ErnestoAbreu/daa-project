@@ -8,7 +8,7 @@ The main problem is defined at [problem description](docs/problem.md).
 
 ### Problem Formalization
 
-Let $G = (V, E)$ be a connected, weighted, and undirected graph. We define a cost function $w: E \to \mathbb{R}^+$ for each edge and a capacity function $k: V \to \mathbb{N}$ representing the maximum allowed degree (available ports) for each vertex $v \in V$.
+Let $G = (V, E)$ be a complete, weighted, and undirected graph. We define a cost function $w: E \to \mathbb{R}^+$ for each edge and a capacity function $k: V \to \mathbb{N}$ representing the maximum allowed degree (available ports) for each vertex $v \in V$.
 
 The goal is to find a spanning tree $T = (V, E')$ that minimizes the total installation cost:
 
@@ -20,7 +20,7 @@ Subject to the following constraints:
 2. **Degree Constraint:** For every vertex $v \in V$, its degree in $T$ must satisfy:
    $$\text{deg}_T(v) \leq k(v)$$
 
-This problem is **NP-Hard**, which can be demonstrated via a polynomial-time reduction from the **Hamiltonian Path** problem (a special case of DCMST where $k(v) = 2$ for all $v$).
+This problem is **NP-Hard**, which can be demonstrated via a polynomial-time reduction from the **Travelling Salesman Problem** (a special case of DCMST where $k(v) = 2$ for all $v$).
 
 ## 🚀 Implemented Solutions
 
