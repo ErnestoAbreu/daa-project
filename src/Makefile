@@ -82,7 +82,7 @@ all_tests: $(GEN_BIN) create_test_dir
 	echo "✓ Todos los casos de prueba generados en $(TEST_DIR)/"
 
 clean:
-	rm -rf $(BIN_DIR) $(TEST_DIR) $(GEN_BIN)
+	rm -rf $(BIN_DIR) $(GEN_BIN)
 	@echo "Limpiado."
 
 help:

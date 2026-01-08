@@ -45,7 +45,8 @@ int main() {
         if (__builtin_popcount(mask) != V - 1) continue;
 
         long double cost = 0;
-        for (int e = 0; auto &[u, v, w]: E) {
+        int e = 0;
+        for (auto &[u, v, w]: E) {
             if (mask >> e & 1) {
                 adj[u].push_back(v);
                 adj[v].push_back(u);

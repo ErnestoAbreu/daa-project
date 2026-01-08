@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 
 TESTS_DIR = "tests"
 BIN_DIR = "bin"
-TIMEOUT = 60  # segundos
+TIMEOUT = 5  # segundos
 OUTPUT_IMAGE = "resultados.png"
 
 
