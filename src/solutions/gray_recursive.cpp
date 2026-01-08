@@ -1,4 +1,5 @@
 #include <bits/stdc++.h>
+#include "../utils/checker.h"
 using namespace std;
 
 #define sz(x) (int)((x).size())
@@ -6,25 +7,11 @@ using namespace std;
 int main() {
     cin.tie(0)->sync_with_stdio(0);
 
-    auto check = [&](int V, const vector<vector<int>> &adj) { 
-        vector<bool> vis(V); int cntCC = 0;
-        auto dfs = [&](auto &&self, int u) -> void {
-            cntCC++; vis[u] = true;
-            for (auto &v: adj[u]) {
-                if (!vis[v]) self(self, v);
-            }
-        };
-
-        dfs(dfs, 0); 
-        
-        return cntCC == V;
-    };
-
     int V, K; cin >> V >> K;
 
-    vector<tuple<int, int, long double>> E;
+    vector<tuple<int, int, int>> E;
 
-    vector mat(V + 1, vector(V + 1, 0.0L));
+    vector mat(V + 1, vector(V + 1, 0));
     for (int i = 0; i < V; i++) {
         for (int j = 0; j < V; j++) {
             string val; cin >> val;
@@ -34,15 +21,15 @@ int main() {
         }
     }
 
-    long double res = numeric_limits<long double>::max();
+    int res = INT32_MAX;
     
-    long double cost = 0; 
+    int cost = 0; 
     vector<vector<int>> adj(V); 
     auto solve = [&](auto &&self, int n, int k, int idx, bool rev) -> void {
         if (k > n || k < 0) return;
 
         if (n == 0) {
-            if (check(V, adj))
+            if (check(V, K, adj))
                 res = min(res, cost);
             return;
         }
@@ -86,5 +73,5 @@ int main() {
 
     solve(solve, sz(E), V - 1, 0, false);
 
-    cout << setprecision(12) << fixed << res << "\n";
+    cout << res << "\n";
 }
