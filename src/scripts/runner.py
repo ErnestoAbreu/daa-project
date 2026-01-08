@@ -43,9 +43,13 @@ def main():
             exe_path = os.path.join(BIN_DIR, exe)
 
             output, exec_time = run_executable(exe_path, input_data)
+            
+            Vraw = test_file.split("_")[2]
+            Kraw = test_file.split("_")[3].replace(".txt", "")
 
             results.append({
-                "Test": test_file[:-4],
+                "V": Vraw,
+                "K": Kraw,
                 "Algorithm": exe[:-4] if exe.endswith(".exe") else exe,
                 "Output": output,
                 "Time (s)": exec_time
