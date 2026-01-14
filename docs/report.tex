@@ -17,6 +17,7 @@
 \usepackage{caption}
 \usepackage{subcaption}
 \usepackage{authblk} 
+\usepackage{multirow}
 
 % --- Paquetes para Código Fuente ---
 \usepackage{listings}
@@ -403,7 +404,7 @@ El número de combinaciones evaluadas es: $\binom{m}{n-1}$ y para cada combinaci
 Por lo tanto, la complejidad es $O(\binom{m}{n-1} \cdot n)$.
 
 \subsection{Enumeración con Código de Gray}
-A continuación se presenta dos algoritmos exactos para el DCMST basados en la enumeración exhaustiva de subconjuntos de aristas utilizando Código de Gray. El enfoque garantiza que subconjuntos consecutivos difieran en exactamente una arista, lo que permite una generación sistemática y eficiente del espacio de soluciones. Se propondrá una solución recursiva con podas.
+A continuación se presenta un algoritmo exacto para el DCMST basados en la enumeración exhaustiva de subconjuntos de aristas utilizando Código de Gray. El enfoque garantiza que subconjuntos consecutivos difieran en exactamente una arista, lo que permite una generación sistemática y eficiente del espacio de soluciones. Se propondrá una solución recursiva con podas.
 
 \subsubsection{Marco Teórico: Código de Gray}
 El código de Gray constituye una secuencia de representaciones binarias tal que dos códigos consecutivos difieren exactamente en un solo bit. Formalmente, el código Gray de un entero $n$ se define como:
@@ -413,44 +414,6 @@ Una técnica para generar todas las combinaciones de tamaño $K$ consiste en gen
 
 Esta propiedad puede demostrarse por inducción utilizando la construcción recursiva del código Gray:
 $$G(N) = 0G(N-1) \cup 1G(N-1)^R$$
-
-\subsubsection{Descripción del Algoritmo Gray Iterativo}
-Sea $G = (V,E)$ un grafo completo con $|V| = n$ vértices y $|E| = m = \frac{n(n-1)}{2}$ aristas. El algoritmo procede como sigue:
-
-El algoritmo genera todas las máscaras de bits correspondientes a los códigos Gray de longitud $m$. Para cada máscara se verifica si contiene exactamente $n-1$ bits activos, lo que corresponde a un subconjunto candidato a árbol generador. (Ver Apéndice \ref{sec:code_gray_iter}).
-
-Para cada subconjunto válido, se construye el grafo inducido y se comprueba: 
-\begin{itemize} 
-    \item Que el grado de cada vértice no exceda $k$; 
-    \item Que el grafo sea conexo, mediante un DFS. 
-\end{itemize}
-
-El costo mínimo entre todas las configuraciones factibles es devuelto como solución.
-
-\subsubsection{Análisis de Correctitud del Algoritmo Gray Iterativo}
-\begin{lemma}\label{lem:exhaustivity3}
-    El algoritmo enumera exhaustivamente todos los subconjuntos de aristas de tamaño $n-1$. 
-\end{lemma}
-\begin{proof} 
-    La secuencia de códigos Gray recorre todas las máscaras binarias de longitud $m$. El filtrado por número de bits activos igual a $n-1$ garantiza que se consideran exactamente todos los subconjuntos de ese tamaño. 
-\end{proof}
-
-\begin{lemma}\label{lem:factible_dcst3}
-    Todo subconjunto aceptado por el algoritmo que pasa las verificaciones corresponde a un árbol generador factible. 
-\end{lemma}
-\begin{proof} 
-    Un subconjunto con $n-1$ aristas que induce un grafo conexo es, por definición, un árbol generador. La verificación adicional del grado asegura el cumplimiento de la restricción $\deg(v) \le k$ para todo vértice $v$. 
-\end{proof}
-
-\begin{theorem} 
-    El algoritmo Gray iterativo devuelve un árbol generador mínimo que satisface la restricción de grado. 
-\end{theorem}
-\begin{proof} 
-    Por el Lema \ref{lem:exhaustivity3} y por el Lema \ref{lem:factible_dcst3} el algoritmo evalúa exhaustivamente todas las soluciones factibles y selecciona aquella de menor costo, la solución devuelta es óptima.
-\end{proof}
-
-\subsubsection{Análisis de Complejidad del Algoritmo Gray Iterativo}
-El algoritmo recorre $2^m$ máscaras, y analiza aquellas con exactamente $n-1$ aristas. Para cada una, la verificación de conectividad y grados requiere $O(n)$ tiempo. Por lo tanto, la complejidad temporal es: $O(2^m + \binom{m}{n-1} \cdot n)$.
 
 \subsubsection{Descripción del Algoritmo Gray Recursivo}
 El algoritmo Gray recursivo implementa directamente la relación:
@@ -503,58 +466,6 @@ Las ramas que violan la restricción de grado se podan anticipadamente.
     Por el Lema \ref{lem:exhaustivity4} y por el Lema \ref{lem:factible_dcst4} el algoritmo explora exhaustivamente el espacio de soluciones factibles y conserva el mínimo costo encontrado, garantizando optimalidad.
 \end{proof}
 
-\section{Análisis Experimental}
-
-\subsection{Implementación}
-
-Con el objetivo de evaluar los algoritmos propuestos para la resolución del problema DCMST, se implementaron todas las soluciones descritas en la sección anterior 
-utilizando el lenguaje de programación \texttt{C++}. La elección de este lenguaje se debe a su eficiencia, amplia disponibilidad de estructuras de datos de bajo 
-nivel y la experiencia de los autores en el mismo, lo cual hace mas sencilla la implementación de algoritmos.
-
-\subsection{Intancias de Prueba}
-
-Las instancias de prueba utilizadas corresponden a grafos completos de distintos tamaños representados en matriz de adyacencia ponderada.
-
-Cada instancia tiene el siguiente formato:
-\begin{itemize}
-    \item La primera línea contiene dos enteros: \( n \) (número de vértices) y \( k \) (restricción de grado para todo vértice).
-    \item Las siguientes \( n \) líneas contienen \( n \) enteros cada una, representando la matriz de costos entre los vértices.
-    \item Se garantiza que la matriz es simétrica y que los valores en la diagonal son cero.
-\end{itemize}
-
-\subsection{Experimentación}
-
-Para cada instancia se evaluó el costo mínimo encontrado, así como el tiempo de ejecución de cada algoritmo, permitiendo comparar su desempeño relativo.
-
-El propósito principal de este análisis experimental no es demostrar escalabilidad, sino:
-\begin{itemize}
-    \item Validar la correctitud de las implementaciones.
-    \item Comparar el impacto de distintas estrategias sobre el tiempo de ejecución.
-\end{itemize}
-
-\subsection{Resultados}
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=1\textwidth]{tiempo_vs_V_K_2.png}
-    \caption{Resultados de soluciones deterministas para K = 2}
-    \label{fig:resultados_k2}
-\end{figure}
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=1\textwidth]{tiempo_vs_V_K_3.png}
-    \caption{Resultados de soluciones deterministas para K = 3}
-    \label{fig:resultados_k3}
-\end{figure}
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=1\textwidth]{tiempo_vs_V_K_4.png}
-    \caption{Resultados de soluciones deterministas para K = 4}
-    \label{fig:resultados_k4}
-\end{figure}
-
 \section{Diseño de metaheurísticas para resolver el DCMST}
 
 \subsection{Método Primal Aleatorizado (RPM)}
@@ -596,48 +507,326 @@ El decodificador construye el árbol iterativamente:
     \item \textbf{Mutación:} Se aplica una mutación puntual con baja probabilidad, reasignando el valor del gen utilizando la misma distribución geométrica sesgada de la inicialización.
 \end{itemize}
 
-\subsection{Detalles de la Implementación}
-
-La implementación se ha realizado en C++ enfocándose en la eficiencia de las estructuras de datos.
-
-\subsubsection{Estructuras de Datos}
-La clase \texttt{Graph} utiliza listas de adyacencia. Un aspecto crítico para la eficiencia del RPM es que las listas de adyacencia se \textbf{pre-ordenan por peso} al inicio del programa.
-
-Esto permite que el decodificador acceda a la $k$-ésima mejor arista en tiempo constante (o lineal respecto al índice $k$, que suele ser pequeño) sin necesidad de reordenar en cada iteración.
-
 \subsubsection{Manejo de Soluciones Inválidas}
 Dado que las restricciones de grado pueden, en ciertas topologías, llevar a callejones sin salida donde no es posible conectar más nodos sin violar restricciones, el decodificador incluye un mecanismo de seguridad. Si el árbol no logra conectar los $n$ nodos, la solución se marca como \texttt{valid = false} y se le asigna un costo infinito, siendo descartada por el proceso de selección del AG.
+
+\subsection{Colonia de Hormigas (ACS)}
+
+La implementación sigue el paradigma del \textit{Ant Colony System} (ACS). El algoritmo construye soluciones iterativamente mediante agentes (hormigas) que recorren el grafo tomando decisiones probabilísticas basadas en dos parámetros: la feromona ($\tau$) y la heurística ($\eta$).
+
+\subsubsection{Modelo de Decisión}
+
+Para una hormiga situada en el proceso de construcción, la elección de la siguiente arista $(u, v)$ para añadir al árbol se basa en la ``atractividad'' de la arista, definida como:
+
+\begin{equation}
+    Attr_{uv} = [\tau_{uv}]^\alpha \cdot [\eta_{uv}]^\beta
+\end{equation}
+
+Donde:
+\begin{itemize}
+    \item $\tau_{uv}$: Nivel de feromona en la arista $(u, v)$, representando la experiencia acumulada de la colonia.
+    \item $\eta_{uv}$: Información heurística, definida inversamente proporcional al peso de la arista ($w_{uv}$):
+    \begin{equation}
+        \eta_{uv} = \frac{1}{w_{uv} + \epsilon}
+    \end{equation}
+    \item $\alpha, \beta$: Parámetros que controlan la influencia relativa de la feromona y la heurística.
+\end{itemize}
+
+\subsubsection{Regla de Transición Pseudo-Aleatoria}
+
+El algoritmo implementa una regla de decisión híbrida controlada por el parámetro $q_0$ (probabilidad de explotación):
+
+Si se genera un número aleatorio $q \in [0, 1]$ tal que $q \leq q_0$, la hormiga elige determinísticamente la mejor arista:
+\begin{equation}
+    (u, v)^* = \arg \max_{(u,v) \in \mathcal{C}} \{ Attr_{uv} \}
+\end{equation}
+
+En caso contrario ($q > q_0$), la hormiga realiza una selección probabilística (exploración) tipo ruleta, donde la probabilidad $P_{uv}$ de elegir la arista $(u, v)$ es:
+\begin{equation}
+    P_{uv} = \frac{Attr_{uv}}{\sum_{(i,j) \in \mathcal{C}} Attr_{ij}}
+\end{equation}
+
+Donde $\mathcal{C}$ es el conjunto de aristas candidatas factibles (aquellas que no cierran ciclos y cumplen la restricción de grado $K$).
+
+\subsubsection{Actualización de Feromonas}
+
+La actualización de feromonas sigue un enfoque elitista para acelerar la convergencia.
+\begin{itemize}
+\item \textbf{Evaporación:} Al final de cada iteración global, la feromona en todas las aristas se evapora para evitar óptimos locales:
+\begin{equation}
+    \tau_{uv} \leftarrow \tau_{uv} \cdot (1 - \rho)
+\end{equation}
+\item \textbf{Depósito de Feromona:} Se realiza un refuerzo basado en las mejores soluciones encontradas:
+\begin{enumerate}
+    \item \textbf{Mejor Local:} La mejor hormiga de la iteración actual deposita feromona.
+    \item \textbf{Mejor Global:} La mejor solución encontrada desde el inicio del algoritmo deposita un refuerzo adicional.
+\end{enumerate}
+El incremento de feromona $\Delta \tau$ es inversamente proporcional al costo total del árbol ($C_{best}$):
+\begin{equation}
+    \tau_{uv} \leftarrow \tau_{uv} + \frac{\text{Constante}}{C_{best}}
+\end{equation}
+\end{itemize}
+
+
+\section{Análisis Experimental}
+
+\subsection{Implementación}
+
+Con el objetivo de evaluar los algoritmos propuestos para la resolución del problema DCMST, se implementaron todas las soluciones descritas en la sección anterior 
+utilizando el lenguaje de programación \texttt{C++}. La elección de este lenguaje se debe a su eficiencia, amplia disponibilidad de estructuras de datos de bajo 
+nivel y la experiencia de los autores en el mismo, lo cual hace mas sencilla la implementación de algoritmos.
+
+\subsection{Intancias de Prueba}
+
+La evaluación se hará por grupos. Cada grupo contiene un conjunto de instancias de prueba con un valor de $100$ puntos cada uno. La puntuación para un grupo será la suma de los puntos obtenidos en cada instancia de ese grupo.
+
+Los puntos serán otorgados dependiendo de qué tan cerca esté la solución del mínimo costo sin tener en cuenta la restricción de $k$ o de una solución exacta encontrada previamente para esa instancia, sea $\text{mst\_cost}$ este mínimo costo y sea $\text{sol\_cost}$ el costo encontrado por el algoritmo a evaluar; la puntuación para esa instancia será:
+
+$$100 \times \frac{\text{mst\_cost}}{\text{sol\_cost}}$$
+
+A continuación se muestra la descripción detallada sobre cada grupo:
+
+\begin{center}
+ \begin{tabular}{|c|c|c|c|c|}
+   \hline
+    \multirow{2}{*}{\bf{Grupos}} &
+    \multicolumn{2}{c|}{\bf{Restricciones adicionales}} &
+    \multirow{2}{*}{\bf{Puntos}} &
+    \multirow{2}{*}{\bf{Tests}} \\ \cline{2-3}
+      & $n$ & $a_{i,j}$ & & \\ \hline
+    \texttt{maxN6} & $2 \le n \le 6$ & --- & $2500$ & $25$ \\ \hline
+    \texttt{maxN9} & $7 \le n \le 9$ & --- & $3000$ & $30$ \\ \hline
+    \texttt{N10} & $n=10$ & --- & $1000$ & $10$ \\ \hline
+    \texttt{N11} & $n=11$ & --- & $1000$ & $10$ \\ \hline
+    \texttt{N12} & $n=12$ & --- & $1500$ & $15$ \\ \hline
+    \texttt{N13} & $n=13$ & --- & $1500$ & $15$ \\ \hline
+    \texttt{N14} & $n=14$ & --- & $1500$ & $15$ \\ \hline
+    \texttt{N15} & $n=15$ & --- & $1500$ & $15$ \\ \hline
+    \texttt{random1} & $16 \le n \le 30$ & --- & $3000$ & $30$ \\ \hline
+    \texttt{random2} & $31 \le n \le 50$ & --- & $3000$ & $30$ \\ \hline
+    \texttt{random3} & $51 \le n \le 70$ & --- & $5000$ & $50$ \\ \hline
+    \texttt{random4} & $71 \le n \le 100$ & --- & $5000$ & $50$ \\ \hline
+ \end{tabular}
+\end{center}
+
+Las instancias de prueba utilizadas corresponden a grafos completos de distintos tamaños representados en matriz de adyacencia ponderada. Cada instancia tiene el siguiente formato:
+\begin{itemize}
+\item La primera línea contiene dos enteros $n$ y $k$ ($1 \le k < n \le 100$) --- la cantidad de edificios y el número máximo de conexiones que soporta cada edificio, respectivamente.
+\item Las siguientes $n$ líneas contienen cada una $n$ enteros. El entero $j$ de la fila $i$, denotado por $a_{i,j}$ ($0 \le a_{i,j} \le 100$) representa el costo de instalar un cable de fibra óptica entre el edificio $i$ y el edificio $j$.
+\item Se garantiza que $a_{i,i} = 0$ para todo $1 \le i \le n$ y que $a_{i,j} = a_{j,i}$ para todo $1 \le i, j \le n$.
+\end{itemize}
+
+La salida de cada algoritmo debe tener el siguiente formato:
+
+\begin{itemize}
+    \item La primera línea debe contener un entero $c$ --- el mínimo costo posible.
+    \item Le deben seguir $n-1$ líneas. La línea $i$ de ellas debe contener tres enteros $u_i$, $v_i$ y $w_i$ ($1 \le u_i, v_i \le n$, $u_i \neq v_i$, $1 \le w_i \le 100$) --- existe una ruta entre los edificios $u_i$ y $v_i$ con costo $w_i$. La instalación formada por estas rutas debe cumplir con las condiciones del problema.
+\end{itemize}
+
+\subsection{Experimentación}
+
+Para cada instancia se evaluó el costo mínimo encontrado, así como el tiempo de ejecución de cada algoritmo, permitiendo comparar su desempeño relativo.
+
+El propósito principal de este análisis experimental no es demostrar escalabilidad, sino:
+\begin{itemize}
+    \item Validar la correctitud de las implementaciones.
+    \item Comparar el impacto de distintas estrategias sobre el tiempo de ejecución.
+\end{itemize}
+
+La experimentación se realizó en las plataformas Codeforces y Polygon. El tiempo límite máximo de ejecución para cada algoritmo fue de $15000 \text{ms}$ y una memoria límite máxima de $1024 \text{mb}$. 
+
+\subsection{Resultados}
+
+A continuación se presentan los resultados obtenidos para los tres algoritmos deterministas implementados, esta tabla muestra la cantidad de puntos obtenidos por cada algoritmo y el tiempo límite máximo en cada grupo.
+
+\begin{center}
+\begin{tabular}{|c|c|c|c|c|c|c|}
+\hline
+\multirow{2}{*}{\bf{Grupos}} 
+  & \multicolumn{2}{c|}{\bf{bitmask}}
+  & \multicolumn{2}{c|}{\bf{comb}}
+  & \multicolumn{2}{c|}{\bf{gray\_recursive}} \\ \cline{2-7}
+
+ & \bf{Puntos} & \bf{Tiempo máx}
+ & \bf{Puntos} & \bf{Tiempo máx}
+ & \bf{Puntos} & \bf{Tiempo máx} \\ \hline
+
+\texttt{maxN6}   & $2500$ & $31$ & $2500$ & $46$ & $2500$ & $46$  \\ \hline
+\texttt{maxN9}   & $2000$ & $15000$ & $3000$ & $14890$ & $3000$ & $7406$ \\ \hline
+\texttt{N10}     & $0$ & $15000$ &  $0$ & $15000$  & $148$ & $15000$ \\ \hline
+\texttt{N11}     & --- & --- & --- & ---  & $0$ & $15000$ \\ \hline
+\texttt{N12}     & --- & --- & --- & ---  & --- & ---  \\ \hline
+\texttt{N13}     & --- & --- & --- & ---  & --- & --- \\ \hline
+\texttt{N14}     & --- & --- & --- & ---  & --- & --- \\ \hline
+\texttt{N15}     & --- & --- & --- & ---  & --- & --- \\ \hline
+\texttt{random1} & --- & --- & --- & ---  & --- & --- \\ \hline
+\texttt{random2} & --- & --- & --- & ---  & --- & --- \\ \hline
+\texttt{random3} & --- & --- & --- & ---  & --- & --- \\ \hline
+\texttt{random4} & --- & --- & --- & ---  & --- & --- \\ \hline
+\texttt{total} & $4500$ & $15000$ & $5500$ & $15000$  & $5648$ & $15000$ \\ \hline
+
+\end{tabular}
+\end{center}
+
+
+De acuerdo con la tabla de comparación de algoritmos (\texttt{bitmask}, \texttt{comb} y \texttt{gray\_recursive}) se observan los siguientes resultados:
+
+\begin{itemize}
+    \item \textbf{Cobertura de grupos:} 
+    \texttt{bitmask} y \texttt{comb} funcionan correctamente únicamente en los grupos más pequeños (\texttt{maxN6} y \texttt{maxN9}). 
+    \texttt{gray\_recursive} es el único algoritmo que obtiene resultados en los grupos medianos (\texttt{N10} y \texttt{N11}), aunque con tiempos máximos cercanos al límite permitido. 
+    Ninguno de los algoritmos logró resolver los grupos más grandes (\texttt{N12}--\texttt{N15} y \texttt{random1}--\texttt{random4}), mostrando limitaciones de escalabilidad.
+    
+    \item \textbf{Puntos obtenidos:} 
+    En \texttt{maxN6}, los tres algoritmos alcanzan la puntuación máxima (2500 puntos), indicando desempeño completo en instancias pequeñas. 
+    Para \texttt{maxN9}, \texttt{bitmask} alcanza solo 2000 puntos, mientras que \texttt{comb} y \texttt{gray\_recursive} logran 3000 puntos, mostrando que \texttt{bitmask} pierde eficiencia en instancias medianas. 
+    En \texttt{N10}, únicamente \texttt{gray\_recursive} obtuvo 148 puntos, mientras que los otros dos algoritmos no lograron puntos.
+    
+    \item \textbf{Tiempo máximo:} 
+    Todos los algoritmos alcanzaron o se aproximaron al tiempo límite (15000 ms) en las instancias más grandes y medianas, lo que indica que estas implementaciones no escalan bien y que los tiempos son críticos para instancias mayores a $n=9$.
+    
+    \item \textbf{Resumen total:} 
+    Sumando los puntos obtenidos por cada algoritmo, \texttt{gray\_recursive} alcanza la puntuación más alta total (5648 puntos), seguido por \texttt{comb} (5500) y \texttt{bitmask} (4500). Esto refleja que \texttt{gray\_recursive} es más robusto frente a instancias medianas, aunque sigue limitado en instancias grandes.
+\end{itemize}
+
+A continuación se presentan los resultados obtenidos para los algoritmos heurísticos implementados, esta tabla muestra la cantidad de puntos obtenidos por cada algoritmo y el tiempo límite máximo en cada grupo.
+
+\begin{center}
+\begin{tabular}{|c|c|c|c|c|c|c|}
+\hline
+\multirow{2}{*}{\bf{Grupos}} 
+  & \multicolumn{2}{c|}{\bf{evolutionary}}
+  & \multicolumn{2}{c|}{\bf{ant\_colony200}}
+  & \multicolumn{2}{c|}{\bf{ant\_colony100}} \\ \cline{2-7}
+
+ & \bf{Puntos} & \bf{Tiempo máx}
+ & \bf{Puntos} & \bf{Tiempo máx}
+ & \bf{Puntos} & \bf{Tiempo máx} \\ \hline
+
+\texttt{maxN6}   & $2500$ & $140$ & $2500$ & $203$ & $2500$ & $93$  \\ \hline
+\texttt{maxN9}   & $2990$ & $265$ & $3000$ & $281$ & $2995$ & $171$ \\ \hline
+\texttt{N10}     & $921$ & $359$ &  $945$ & $375$  & $945$ & $234$ \\ \hline
+\texttt{N11}     & $895$ & $375$ & $970$ & $531$  & $970$ & $265$ \\ \hline
+\texttt{N12}     & $1275$ & $421$ & $1429$ & $687$  & $1424$ & $390$  \\ \hline
+\texttt{N13}     & $1321$ & $468$ & $1417$ & $906$  & $1416$ & $484$ \\ \hline
+\texttt{N14}     & $1302$ & $531$ & $1450$ & $1187$  & $1450$ & $609$ \\ \hline
+\texttt{N15}     & $1197$ & $609$ & $1426$ & $1593$  & $1426$ & $765$ \\ \hline
+\texttt{random1} & $2314$ & $2453$ & $2945$ & $12625$  & $2941$ & $7187$ \\ \hline
+\texttt{random2} & $1691$ & $7828$ & $233$ & $15000$  & $1230$ & $15000$ \\ \hline
+\texttt{random3} & $2342$ & $15000$ & $0$ & $15000$  & $0$ & $15000$ \\ \hline
+\texttt{random4} & $20$ & $15000$ & $0$ & $15000$  & $0$ & $15000$ \\ \hline
+\texttt{total} & $18768$ & $15000$ & $16315$ & $15000$  & $17297$ & $15000$ \\ \hline
+
+\end{tabular}
+\end{center}
+
+\begin{center}
+\begin{tabular}{|c|c|c|c|c|c|c|}
+\hline
+\multirow{2}{*}{\bf{Grupos}} 
+  & \multicolumn{2}{c|}{\bf{ant\_colony50}}
+  & \multicolumn{2}{c|}{\bf{ant\_colony25}}
+  & \multicolumn{2}{c|}{\bf{ant\_colony12}} \\ \cline{2-7}
+
+ & \bf{Puntos} & \bf{Tiempo máx}
+ & \bf{Puntos} & \bf{Tiempo máx}
+ & \bf{Puntos} & \bf{Tiempo máx} \\ \hline
+
+\texttt{maxN6}   & $2500$ & $93$ & $2500$ & $46$ & $2500$ & $31$  \\ \hline
+\texttt{maxN9}   & $2995$ & $109$ & $2995$ & $62$ & $2995$ & $62$ \\ \hline
+\texttt{N10}     & $945$ & $140$ &  $945$ & $93$  & $945$ & $62$ \\ \hline
+\texttt{N11}     & $970$ & $156$ & $970$ & $125$  & $967$ & $62$ \\ \hline
+\texttt{N12}     & $1424$ & $203$ & $1424$ & $125$  & $1422$ & $78$  \\ \hline
+\texttt{N13}     & $1417$ & $265$ & $1417$ & $156$  & $1409$ & $93$ \\ \hline
+\texttt{N14}     & $1450$ & $312$ & $1447$ & $187$  & $1446$ & $109$ \\ \hline
+\texttt{N15}     & $1426$ & $406$ & $1426$ & $203$  & $1426$ & $125$ \\ \hline
+\texttt{random1} & $2942$ & $3578$ & $2940$ & $1765$  & $2937$ & $937$ \\ \hline
+\texttt{random2} & $2225$ & $15000$ & $2925$ & $9250$  & $2924$ & $4546$ \\ \hline
+\texttt{random3} & $0$ & $15000$ & $2262$ & $15000$  & $4955$ & $12984$ \\ \hline
+\texttt{random4} & $0$ & $15000$ & $0$ & $15000$  & $356$ & $15000$ \\ \hline
+\texttt{total} & $18294$ & $15000$ & $21251$ & $15000$  & $24282$ & $15000$ \\ \hline
+
+\end{tabular}
+\end{center}
+
+Se presentan los resultados de comparación de los algoritmos \texttt{evolutionary} y variantes de \texttt{ant\_colony} con diferentes parámetros de población.
+
+\begin{itemize}
+    \item \textbf{Cobertura de grupos:}
+    Todos los algoritmos obtienen resultados completos en los grupos más pequeños (\texttt{maxN6} y \texttt{maxN9}). A medida que el tamaño de las instancias aumenta, los algoritmos comienzan a diferenciarse: \texttt{evolutionary} mantiene puntuaciones consistentes hasta \texttt{N15} y \texttt{random1}, pero pierde eficacia en \texttt{random2--random4}. Las versiones de \texttt{ant\_colony} muestran un comportamiento dependiente del tamaño de población: las colonias mayores (200, 100) alcanzan mejores resultados en instancias medianas, mientras que las colonias más pequeñas (50, 25, 12) obtienen puntuaciones más bajas en los grupos grandes.
+
+    \item \textbf{Puntos obtenidos:}
+    \begin{itemize}
+        \item En los grupos pequeños y medianos (\texttt{maxN6}--\texttt{N15}), todos los algoritmos alcanzan puntuaciones altas y consistentes, aunque \texttt{ant\_colony200} y \texttt{ant\_colony100} superan ligeramente a \texttt{evolutionary} en algunos casos (\texttt{N12--N15}).
+        \item Para instancias grandes y aleatorias (\texttt{random1--random4}), la puntuación total aumenta conforme se incrementa la población de la colonia de hormigas: por ejemplo, \texttt{ant\_colony12} obtiene 24282 puntos totales frente a 18294 de \texttt{ant\_colony50}.
+        \item En general, \texttt{ant\_colony12} y \texttt{ant\_colony25} muestran que con una configuración adecuada se pueden superar los resultados de \texttt{evolutionary} en instancias grandes.
+    \end{itemize}
+
+    \item \textbf{Tiempo máximo:}
+    \begin{itemize}
+        \item Los tiempos de \texttt{evolutionary} son moderados en instancias pequeñas y medianas, pero alcanzan 15000 ms (tiempo límite) en las instancias más grandes (\texttt{random3--random4}).
+        \item Las versiones de \texttt{ant\_colony} muestran un comportamiento dependiente de la población: colonias grandes tardan más (hasta 15000 ms en algunos casos), mientras que colonias pequeñas reducen significativamente el tiempo, aunque algunas puntuaciones disminuyen.
+        \item Existe un trade-off claro entre tamaño de población y tiempo de ejecución: mayor población → mejores resultados pero mayor tiempo; menor población → resultados más rápidos pero potencialmente menores.
+    \end{itemize}
+
+    \item \textbf{Resumen total:}
+    \begin{itemize}
+        \item En puntuación total acumulada, \texttt{ant\_colony12} es el algoritmo más efectivo (24282 puntos), seguido por \texttt{ant\_colony25} (21251) y \texttt{evolutionary} (18768).
+        \item Esto indica que, aunque \texttt{evolutionary} es estable y consistente, las variantes de colonia de hormigas bien parametrizadas superan el rendimiento en instancias grandes.
+    \end{itemize}
+\end{itemize}
+
+% \begin{figure}[H]
+%     \centering
+%     \includegraphics[width=1\textwidth]{tiempo_vs_V_K_2.png}
+%     \caption{Resultados de soluciones deterministas para K = 2}
+%     \label{fig:resultados_k2}
+% \end{figure}
+
+% \begin{figure}[H]
+%     \centering
+%     \includegraphics[width=1\textwidth]{tiempo_vs_V_K_3.png}
+%     \caption{Resultados de soluciones deterministas para K = 3}
+%     \label{fig:resultados_k3}
+% \end{figure}
+
+% \begin{figure}[H]
+%     \centering
+%     \includegraphics[width=1\textwidth]{tiempo_vs_V_K_4.png}
+%     \caption{Resultados de soluciones deterministas para K = 4}
+%     \label{fig:resultados_k4}
+% \end{figure}
 
 \section{Conclusiones}
 En este trabajo se detalló el análisis y solución del problema DCMST. Se demostró su complejidad NP-Hard y se presentaron cuatro variantes algorítmicas exactas para su resolución.
 
 \newpage
-\appendix
-\section{Apéndice: Implementaciones en C++}
+% \appendix
+% \section{Apéndice: Implementaciones en C++}
 
-A continuación se presentan las implementaciones completas utilizadas en el estudio.
+% A continuación se presentan las implementaciones completas utilizadas en el estudio.
 
-\subsection{Solución 1: Fuerza Bruta con Máscara de Bits} \label{sec:code_bitmask}
-\lstinputlisting[
-    language=C++
-]{../src/solutions/bitmask.cpp}
-
-
-\subsection{Solución 2: Generación Combinatoria Lexicográfica} \label{sec:code_comb}
-\lstinputlisting[
-    language=C++
-]{../src/solutions/comb.cpp}
-
-\subsection{Solución 3: Código de Gray Iterativo} \label{sec:code_gray_iter}
-\lstinputlisting[
-    language=C++
-]{../src/solutions/gray_iterative.cpp}
+% \subsection{Solución 1: Fuerza Bruta con Máscara de Bits} \label{sec:code_bitmask}
+% \lstinputlisting[
+%     language=C++
+% ]{../src/solutions/bitmask.cpp}
 
 
-\subsection{Solución 4: Código de Gray Recursivo con Poda} \label{sec:code_gray_rec}
-\lstinputlisting[
-    language=C++
-]{../src/solutions/gray_recursive.cpp}
+% \subsection{Solución 2: Generación Combinatoria Lexicográfica} \label{sec:code_comb}
+% \lstinputlisting[
+%     language=C++
+% ]{../src/solutions/comb.cpp}
+
+% \subsection{Solución 3: Código de Gray Iterativo} \label{sec:code_gray_iter}
+% \lstinputlisting[
+%     language=C++
+% ]{../src/solutions/gray_iterative.cpp}
+
+
+% \subsection{Solución 4: Código de Gray Recursivo con Poda} \label{sec:code_gray_rec}
+% \lstinputlisting[
+%     language=C++
+% ]{../src/solutions/gray_recursive.cpp}
 
 \begin{thebibliography}{9}
 \bibitem{clrs} 
