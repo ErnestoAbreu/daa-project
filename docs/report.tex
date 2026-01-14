@@ -473,6 +473,80 @@ Las ramas que violan la restricción de grado se podan anticipadamente.
     Por el Lema \ref{lem:exhaustivity4} y por el Lema \ref{lem:factible_dcst4} el algoritmo explora exhaustivamente el espacio de soluciones factibles y conserva el mínimo costo encontrado, garantizando optimalidad.
 \end{proof}
 
+\subsection{Enumeración Exhaustiva con Gosper's hack}
+
+\subsubsection{Descripción del algoritmo}
+Sea $E$ el conjunto de aristas del grafo, construido tomando todos los pares $i<j$ con peso $\texttt{mat}[i][j]$.
+El algoritmo enumera \textbf{todos} los subconjuntos de aristas $E' \subseteq E$ con cardinalidad exactamente $|E'|=V-1$.
+Para cada subconjunto:
+\begin{enumerate}
+    \item Construye el subgrafo inducido $G'=(V,E')$ mediante listas de adyacencia.
+    \item Calcula el costo total $\sum_{e \in E'} w(e)$.
+    \item Verifica factibilidad mediante \texttt{check(V,K,adj)}, que comprueba:
+    \begin{itemize}
+        \item que $G'$ sea un árbol generador (conexo y acíclico), y
+        \item que $\deg_{G'}(v) \le K$ para todo $v\in V$.
+    \end{itemize}
+    \item Si es factible y su costo es menor que el mejor registrado, actualiza la solución óptima.
+\end{enumerate}
+
+La enumeración se realiza usando una \textbf{máscara de bits} \texttt{mask} de 64 bits que indica qué aristas de $E$ están seleccionadas.
+Para iterar eficientemente por todas las máscaras con exactamente $V-1$ bits en 1, se utiliza la técnica conocida como
+\textit{Gosper's hack}, que genera en tiempo $O(1)$ la siguiente combinación de tamaño fijo.
+
+\[
+\begin{aligned}
+c &= mask \ \&\ (-mask) \\
+r &= mask + c \\
+mask' &= r\ \vert\ \left(\frac{(r \oplus mask) \gg 2}{c}\right).
+\end{aligned}
+\]
+Intuitivamente, $c$ aísla el bit menos significativo encendido, $r$ produce el “acarreo” que mueve hacia la izquierda
+el bloque adecuado de bits, y el último término recoloca los bits restantes en las posiciones menos significativas para
+mantener el conteo de unos constante.
+
+\subsubsection{Correctitud}
+\begin{lemma}[Exhaustividad]
+El algoritmo considera todos los subconjuntos $E' \subseteq E$ tales que $|E'|=V-1$.
+\end{lemma}
+\begin{proof}
+La variable \texttt{mask} codifica subconjuntos de $E$. Se inicializa con $V-1$ bits activados y se actualiza usando
+\textit{Gosper's hack}, que genera sin repetición todas las máscaras de longitud $|E|$ con exactamente $V-1$ bits en 1.
+Por tanto, se recorren todas las combinaciones posibles de $V-1$ aristas.
+\end{proof}
+
+\begin{lemma}[Filtrado de factibilidad]
+Una combinación $E'$ es aceptada si y solo si induce un árbol generador que respeta la cota de grado $\deg(v)\le K$.
+\end{lemma}
+\begin{proof}
+La función \texttt{check(V,K,adj)} verifica precisamente (i) que el subgrafo sea un árbol generador y (ii) que se cumpla la cota de grado.
+Por consiguiente, el algoritmo acepta exactamente las combinaciones factibles.
+\end{proof}
+
+\begin{theorem}[Optimalidad]
+Si existe al menos una solución factible, el algoritmo devuelve una solución factible de costo mínimo.
+\end{theorem}
+\begin{proof}
+Por el Lema de Exhaustividad, toda solución candidata con $V-1$ aristas es evaluada. Por el Lema de Factibilidad, únicamente las soluciones factibles pueden actualizar el óptimo.
+El algoritmo mantiene el mínimo costo entre todas las soluciones factibles examinadas; luego, el resultado final es óptimo.
+\end{proof}
+
+\subsection{Complejidad}
+Sea $n=V$ y $m=|E|=\frac{n(n-1)}{2}$.
+El número de subconjuntos evaluados es:
+\[
+\binom{m}{n-1}.
+\]
+Para cada subconjunto, el programa recorre todas las $m$ aristas para construir $E'$ y calcular el costo, lo que cuesta $O(m)$,
+más el costo de \texttt{check}, típicamente $O(n)$ al operar sobre un subgrafo con $n-1$ aristas.
+Por tanto, una cota superior del tiempo total es:
+\[
+O\!\left(\binom{m}{n-1}\cdot (m+n)\right),
+\]
+lo cual es combinatorio y solo viable para instancias pequeñas.
+
+El uso de memoria es $O(n^2)$ por la matriz de costos, $O(m)$ por el vector de aristas y $O(n)$ por las adyacencias del subgrafo actual.
+
 \section{Diseño de metaheurísticas para resolver el DCMST}
 
 \subsection{Método Primal Aleatorizado (RPM)}
