@@ -1,15 +1,15 @@
 #include <bits/stdc++.h>
 using namespace std;
 
-const int NUM_NODES = 50;
-const int MAX_DEGREE = 3;       // The 'd' in d-MST
 const int POPULATION_SIZE = 50; // GA Population
 const int GENERATIONS = 1000;
 const double MUTATION_RATE = 0.05;
 
+int MAX_DEGREE = 3;       // The 'd' in d-MST
+
 struct Edge {
     int u, v;
-    double weight;
+    int weight;
     
     bool operator<(const Edge& other) const {
         return weight < other.weight;
@@ -23,7 +23,7 @@ public:
 
     Graph(int nodes) : n(nodes), adj(nodes) {}
 
-    void addEdge(int u, int v, double w) {
+    void addEdge(int u, int v, int w) {
         adj[u].push_back({u, v, w});
         adj[v].push_back({v, u, w});
     }
@@ -42,7 +42,7 @@ using Chromosome = vector<vector<int>>;
 
 struct Solution {
     vector<Edge> treeEdges;
-    double totalCost;
+    int totalCost;
     bool valid; // True if a spanning tree was successfully formed
 };
 
@@ -72,7 +72,7 @@ public:
         // General Step: Loop until we have a spanning tree (n-1 edges)
         while (verticesInTree < n) {
             
-            Edge bestEdge = {-1, -1, numeric_limits<double>::max()};
+            Edge bestEdge = {-1, -1, numeric_limits<int>::max()};
             bool foundCandidate = false;
 
             // 1. For each vertex i in S whose current degree < d
@@ -86,7 +86,7 @@ public:
                 int validEdgesFound = 0;
                 int desiredIndex = chrom[i][currentDegree[i]]; // The allele a(i, d_i)
                 
-                Edge candidateForNodeI = {-1, -1, -1.0};
+                Edge candidateForNodeI = {-1, -1, -1};
                 bool foundForNodeI = false;
 
                 // Look through pre-sorted edges of node i
@@ -209,16 +209,16 @@ public:
         RPMSolver solver(graph, degreeConstraint);
         
         // Track best
-        double globalBestCost = numeric_limits<double>::max();
+        int globalBestCost = numeric_limits<int>::max();
         Chromosome globalBestChrom;
 
         for (int gen = 0; gen < generations; ++gen) {
-            vector<pair<double, int>> fitness;
+            vector<pair<int, int>> fitness;
             
             // 1. Evaluate
             for (int i = 0; i < popSize; ++i) {
                 Solution s = solver.decode(population[i]);
-                double cost = s.valid ? s.totalCost : numeric_limits<double>::max();
+                int cost = s.valid ? s.totalCost : numeric_limits<int>::max();
                 fitness.push_back({cost, i});
 
                 if (s.valid && cost < globalBestCost) {
@@ -256,8 +256,9 @@ public:
             population = nextGen;
         }
 
-        cout << "\n--- Final Result ---" << endl;
-        cout << "Best d-MST Cost Found: " << globalBestCost << endl;
+        // cerr << "\n--- Final Result ---" << endl;
+        // cerr << "Best d-MST Cost Found: " << globalBestCost << endl;
+
         
         // Output degree check
         Solution finalSol = solver.decode(globalBestChrom);
@@ -266,29 +267,36 @@ public:
             degrees[e.u]++;
             degrees[e.v]++;
         }
-        cout << "Max Degree in Solution: ";
-        int maxD = 0;
-        for(int d : degrees) maxD = max(maxD, d);
-        cout << maxD << " (Constraint: " << degreeConstraint << ")" << endl;
+        
+        cout << globalBestCost << "\n";
+        for (auto &e: finalSol.treeEdges) {
+            cout << e.u+1 << " " << e.v+1 << " " << e.weight << "\n";
+        }
+
+        // cerr << "Max Degree in Solution: ";
+        // int maxD = 0;
+        // for(int d : degrees) maxD = max(maxD, d);
+        // cerr << maxD << " (Constraint: " << degreeConstraint << ")" << endl;
     }
 };
 
 int main() {
     cin.tie(0)->sync_with_stdio(0);
-    cout.precision(12); cout << fixed;
 
     int V, K; cin >> V >> K;
    
     Graph G(V);
     for (int i = 0; i < V; i++) {
         for (int j = 0; j < V; j++) {
-            string val; cin >> val;
+            int val; cin >> val;
 
-            if (i < j) G.addEdge(i, j, stod(val));
+            if (i < j) G.addEdge(i, j, val);
         }
     }
 
-    cout << "Running GA with RPM for degree constraint d=" << MAX_DEGREE << endl;
+    MAX_DEGREE = K;
+
+    // cerr << "Running GA with RPM for degree constraint d=" << MAX_DEGREE << endl;
     GeneticAlgorithm ga(G, POPULATION_SIZE, MAX_DEGREE);
     
     ga.initializePopulation();

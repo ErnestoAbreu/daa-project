@@ -3,7 +3,7 @@ using namespace std;
 
 #define sz(x) (int)((x).size())
 
-using Edge = tuple<int, int, long double>;
+using Edge = tuple<int, int, int>;
 
 struct DSU {
     vector<int> e; 
@@ -21,12 +21,12 @@ struct DSU {
 struct Instance { 
     int V, K; 
     vector<Edge> edges; 
-    vector<vector<long double>> mat; 
+    vector<vector<int>> mat; 
 };
 
 mt19937 rng(time(nullptr));
 
-long double drand(long double a, long double b) {
+double drand(double a, double b) {
     uniform_real_distribution<long double> dist(a, b);
     return dist(rng);
 }
@@ -36,8 +36,8 @@ int irand(int a, int b) {
     return dist(rng);
 }
 
-long double treeCost(const vector<Edge> &edges) {
-    long double res = 0;
+int treeCost(const vector<Edge> &edges) {
+    int res = 0;
     for (auto &[u, v, w]: edges)
         res += w;
     return res;
@@ -96,23 +96,24 @@ vector<Edge> randomTree(const Instance &I) {
     return isSpanningTree(tree, V) ? tree : vector<Edge>{};
 }
 
-vector<Edge> antColony(const Instance& I, int ants = 50, int iter = 200, long double alpha = 1.0, long double beta = 2.0, long double rho = 0.1, long double q0 = 0.9) {
+vector<Edge> antColony(const Instance& I, int ants = 50, int iter = 200, double alpha = 1.0, double beta = 2.0, double rho = 0.1, double q0 = 0.9) {
     int V = I.V, K = I.K, m = sz(I.edges);
     map<pair<int, int>, int> edgeIdx;
     for (int i = 0; auto &[u, v, w]: I.edges) {
         edgeIdx[{u, v}] = edgeIdx[{v, u}] = i;
     } 
 
-    vector<long double> tau(m, 1.0);
-    long double best = numeric_limits<long double>::max();
+    vector<double> tau(m, 1.0);
+    int best = numeric_limits<int>::max();
     vector<Edge> bestTree;
 
     for (int it = 0; it < iter; it++) {
-        vector<pair<vector<Edge>, long double>> antsCost;
+        vector<pair<vector<Edge>, int>> antsCost;
         for (int a = 0; a < ants; a++) {
             struct Cand {
                 int u, v, idx;
-                long double w, attr;
+                int w;
+                double attr;
             };
 
             vector<Edge> tree;
@@ -125,8 +126,8 @@ vector<Edge> antColony(const Instance& I, int ants = 50, int iter = 200, long do
                     for (int v = u + 1; v < V; v++) {
                         if (deg[u] < K && deg[v] < K && !D.sameSet(u, v)) {
                             int idx = edgeIdx[{u, v}];
-                            long double heuristic = powl(1.0L / (I.mat[u][v] + 1e-9), beta);
-                            long double attr = powl(tau[idx], alpha) * heuristic;
+                            double heuristic = pow(1.0L / (I.mat[u][v] + 1e-9), beta);
+                            double attr = pow(tau[idx], alpha) * heuristic;
                             cands.push_back({u, v, idx, I.mat[u][v], attr});
                         }
                     }
@@ -143,11 +144,11 @@ vector<Edge> antColony(const Instance& I, int ants = 50, int iter = 200, long do
 
                 int idx = 0;
                 if (drand(0.0, 1.0) >= q0) {
-                    long double s = 0;
+                    double s = 0;
                     for (auto &c: cands) s += c.attr;
                     if (s <= 0) idx = irand(0, sz(cands) - 1);
                     else {
-                        long double r = drand(0.0, s), cum = 0;
+                        double r = drand(0.0, s), cum = 0;
                         for (int i = 0; i < sz(cands); i++) {
                             cum += cands[i].attr;
                             if (r <= cum) {
@@ -168,7 +169,7 @@ vector<Edge> antColony(const Instance& I, int ants = 50, int iter = 200, long do
                 tree = randomTree(I);
             }
 
-            long double cost = treeCost(tree);
+            int cost = treeCost(tree);
             antsCost.push_back({tree, cost});
             if (cost < best) {
                 best = cost; bestTree = tree;
@@ -178,7 +179,7 @@ vector<Edge> antColony(const Instance& I, int ants = 50, int iter = 200, long do
         for (auto &x: tau) x *= (1.0 - rho);
         if (!antsCost.empty()) {
             auto localBest = *min_element(begin(antsCost), end(antsCost), [](auto &a, auto &b) { return a.second < b.second; });
-            long double deposit = 1.0 / (localBest.second + 1e-9);
+            double deposit = 1.0 / (localBest.second + 1e-9);
             for (auto &e: localBest.first) {
                 int u = get<0>(e), v = get<1>(e);
                 tau[edgeIdx[{u, v}]] += deposit;
@@ -186,7 +187,7 @@ vector<Edge> antColony(const Instance& I, int ants = 50, int iter = 200, long do
         }
 
         if (!bestTree.empty()) {
-            long double deposit = 0.5/(best + 1e-9);
+            double deposit = 0.5/(best + 1e-9);
             for (auto &e: bestTree){ 
                 int u = get<0>(e), v = get<1>(e); 
                 tau[edgeIdx[{u,v}]] += deposit; 
@@ -202,13 +203,12 @@ int main() {
 
     int V, K; cin >> V >> K;
 
-    vector<tuple<int, int, long double>> E;
+    vector<tuple<int, int, int>> E;
 
-    vector mat(V + 1, vector(V + 1, 0.0L));
+    vector mat(V + 1, vector(V + 1, 0));
     for (int i = 0; i < V; i++) {
         for (int j = 0; j < V; j++) {
-            string val; cin >> val;
-            mat[i][j] = stold(val);
+            cin >> mat[i][j];
 
             if (i < j) E.push_back({i, j, mat[i][j]});
         }
@@ -220,8 +220,12 @@ int main() {
     auto tree = antColony(I);
     
     if (sz(tree) != V - 1) {
-        cout << setprecision(12) << fixed << numeric_limits<long double>::max();
+        assert(false);
     } else {
-        cout << setprecision(12) << fixed << treeCost(tree) << "\n";
+        cout << treeCost(tree) << "\n";
+    
+        for (auto &[u, v, w]: tree) {
+            cout << u+1 << " " << v+1 << " " << w << "\n";
+        }
     }
 }

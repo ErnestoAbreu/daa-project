@@ -25,12 +25,17 @@ int main() {
     
     int cost = 0; 
     vector<vector<int>> adj(V); 
+    vector<array<int, 3>> edges, best;
     auto solve = [&](auto &&self, int n, int k, int idx, bool rev) -> void {
         if (k > n || k < 0) return;
 
         if (n == 0) {
-            if (check(V, K, adj))
-                res = min(res, cost);
+            if (check(V, K, adj)) {
+                if (cost < res) {
+                    best = edges;
+                    res = cost;
+                }
+            }
             return;
         }
 
@@ -40,6 +45,7 @@ int main() {
             if (rev) {
                 adj[u].push_back(v);
                 adj[v].push_back(u);
+                edges.push_back({u, v, w});
                 cost += w;
             }
 
@@ -49,6 +55,7 @@ int main() {
             if (rev) {
                 adj[u].pop_back();
                 adj[v].pop_back();
+                edges.pop_back();
                 cost -= w;
             }
         }
@@ -57,6 +64,7 @@ int main() {
             if (!rev) {
                 adj[u].push_back(v);
                 adj[v].push_back(u);
+                edges.push_back({u, v, w});
                 cost += w;
             }
 
@@ -66,6 +74,7 @@ int main() {
             if (!rev) {
                 adj[u].pop_back();
                 adj[v].pop_back();
+                edges.pop_back();
                 cost -= w;
             } 
         }
@@ -74,4 +83,7 @@ int main() {
     solve(solve, sz(E), V - 1, 0, false);
 
     cout << res << "\n";
+
+    for (auto &[u, v, w]: best)
+        cout << u << " " << v << " " << w << "\n";
 }
