@@ -262,12 +262,19 @@ A continuación, demostramos que DCST es NP-Hard mediante una reducción polinom
 
 Sea \( G = (V, E) \) una instancia arbitraria del problema Hamiltonian Path. Construimos una instancia del problema DCST sobre el mismo grafo \( G \), imponiendo una restricción de grado uniforme \( k(v) = 2 \) para todo vértice \( v \in V \).
 
-Bajo esta restricción, cualquier árbol de expansión factible debe tener grado a lo sumo 2 en cada vértice. Como consecuencia, dicho árbol solo puede ser un camino simple que cubra todos los vértices del grafo, es decir, un camino hamiltoniano.
+$G$ tiene un camino hamiltoniano si y solo si existe un árbol generador $T$ de $G$ tal que $deg_T(v) \le 2$ para todo $v \in V$.
 
-Por tanto, existe un árbol de expansión que satisface las restricciones de grado si y solo si existe un camino hamiltoniano en el grafo original. La reducción es claramente polinomial.
+\textit{($\Rightarrow$)} Si $G$ tiene un camino hamiltoniano $P$ que visita todos los vértices exactamente una vez,
+entonces las aristas de $P$ forman un subgrafo conexo con $|V|-1$ aristas, por lo que es un árbol generador $T$.
+Además, en un camino los extremos tienen grado $1$ y los vértices internos grado $2$, así que $\deg_T(v)\le 2$ para todo $v$.
 
-Dado que DCST es NP-Hard y pertenece a NP, se concluye que el problema DCST es NP-Completo.
+\textit{($\Leftarrow$)} Supongamos ahora que existe un árbol generador $T$ de $G$ tal que $\deg_T(v)\le 2$ para todo $v$.
+Un árbol en el que todos los vértices tienen grado a lo sumo $2$ necesariamente es un camino simple que incluye a todos los vértices:
+si existiera un vértice de grado $3$ o más no cumpliría la cota; y si tuviera varios componentes no sería árbol generador.
+Por lo tanto, $T$ es un camino que visita todos los vértices exactamente una vez, es decir, un camino hamiltoniano en $G$.
 \end{proof}
+
+Como DCST $\in$ NP y DCST es NP-Hard, se tiene que DCST es NP-Completo.
 
 \section{Diseño de Soluciones Algorítmicas}
 Se desarrollaron e implementaron cuatro enfoques principales. El código fuente completo de cada implementación se encuentra en el Apéndice A.
@@ -842,4 +849,4 @@ Wanru Gao, Mojgan Pourhassan, Vahid Roostapour, and Frank Neumann. 2019. Runtime
 
 \end{thebibliography}
 
-\end{document}
+\end{document} 
