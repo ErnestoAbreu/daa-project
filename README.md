@@ -61,7 +61,7 @@ These algorithms provide high-quality approximate solutions for larger instances
 #### 5. **Randomized Primal Method (RPM) with Genetic Algorithm** ([evolutionary.cpp](src/metaheuristics/evolutionary.cpp))
 
 - **Approach:** Hybrid method combining Prim's algorithm with genetic algorithms
-- **Complexity:** $O(\text{generations} \times \text{population\_size} \times n^2)$
+- **Complexity:** $O(\text{generations} \times \text{population size} \times n^2)$
 - **Best for:** Instances with $n \leq 100$
 
 #### 6. **Ant Colony System (ACS)** ([ant_colony.cpp](src/metaheuristics/ant_colony.cpp))
