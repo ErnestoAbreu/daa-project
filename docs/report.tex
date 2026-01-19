@@ -725,7 +725,7 @@ A continuación se presentan los resultados obtenidos para los tres algoritmos d
 \hline
 \multirow{2}{*}{\bf{Grupos}} 
   & \multicolumn{2}{c|}{\bf{bitmask}}
-  & \multicolumn{2}{c|}{\bf{comb}}
+  & \multicolumn{2}{c|}{\bf{comb/gosper}}
   & \multicolumn{2}{c|}{\bf{gray\_recursive}} \\ \cline{2-7}
 
  & \bf{Puntos} & \bf{Tiempo máx}
@@ -750,24 +750,24 @@ A continuación se presentan los resultados obtenidos para los tres algoritmos d
 \end{center}
 
 
-De acuerdo con la tabla de comparación de algoritmos (\texttt{bitmask}, \texttt{comb} y \texttt{gray\_recursive}) se observan los siguientes resultados:
+De acuerdo con la tabla de comparación de algoritmos (\texttt{bitmask}, \texttt{comb/gosper} y \texttt{gray\_recursive}) se observan los siguientes resultados:
 
 \begin{itemize}
     \item \textbf{Cobertura de grupos:} 
-    \texttt{bitmask} y \texttt{comb} funcionan correctamente únicamente en los grupos más pequeños (\texttt{maxN6} y \texttt{maxN9}). 
+    \texttt{bitmask} y \texttt{comb/gosper} funcionan correctamente únicamente en los grupos más pequeños (\texttt{maxN6} y \texttt{maxN9}). 
     \texttt{gray\_recursive} es el único algoritmo que obtiene resultados en los grupos medianos (\texttt{N10} y \texttt{N11}), aunque con tiempos máximos cercanos al límite permitido. 
     Ninguno de los algoritmos logró resolver los grupos más grandes (\texttt{N12}--\texttt{N15} y \texttt{random1}--\texttt{random4}), mostrando limitaciones de escalabilidad.
     
     \item \textbf{Puntos obtenidos:} 
     En \texttt{maxN6}, los tres algoritmos alcanzan la puntuación máxima (2500 puntos), indicando desempeño completo en instancias pequeñas. 
-    Para \texttt{maxN9}, \texttt{bitmask} alcanza solo 2000 puntos, mientras que \texttt{comb} y \texttt{gray\_recursive} logran 3000 puntos, mostrando que \texttt{bitmask} pierde eficiencia en instancias medianas. 
+    Para \texttt{maxN9}, \texttt{bitmask} alcanza solo 2000 puntos, mientras que \texttt{comb/gosper} y \texttt{gray\_recursive} logran 3000 puntos, mostrando que \texttt{bitmask} pierde eficiencia en instancias medianas. 
     En \texttt{N10}, únicamente \texttt{gray\_recursive} obtuvo 148 puntos, mientras que los otros dos algoritmos no lograron puntos.
     
     \item \textbf{Tiempo máximo:} 
     Todos los algoritmos alcanzaron o se aproximaron al tiempo límite (15000 ms) en las instancias más grandes y medianas, lo que indica que estas implementaciones no escalan bien y que los tiempos son críticos para instancias mayores a $n=9$.
     
     \item \textbf{Resumen total:} 
-    Sumando los puntos obtenidos por cada algoritmo, \texttt{gray\_recursive} alcanza la puntuación más alta total (5648 puntos), seguido por \texttt{comb} (5500) y \texttt{bitmask} (4500). Esto refleja que \texttt{gray\_recursive} es más robusto frente a instancias medianas, aunque sigue limitado en instancias grandes.
+    Sumando los puntos obtenidos por cada algoritmo, \texttt{gray\_recursive} alcanza la puntuación más alta total (5648 puntos), seguido por \texttt{comb/gosper} (5500) y \texttt{bitmask} (4500). Esto refleja que \texttt{gray\_recursive} es más robusto frente a instancias medianas, aunque sigue limitado en instancias grandes.
 \end{itemize}
 
 A continuación se presentan los resultados obtenidos para los algoritmos heurísticos implementados, esta tabla muestra la cantidad de puntos obtenidos por cada algoritmo y el tiempo límite máximo en cada grupo.
