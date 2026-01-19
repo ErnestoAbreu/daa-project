@@ -1,11 +1,9 @@
 #include <bits/stdc++.h>
 using namespace std;
 
-const int POPULATION_SIZE = 50; // GA Population
+const int POPULATION_SIZE = 50;
 const int GENERATIONS = 1000;
 const double MUTATION_RATE = 0.05;
-
-int MAX_DEGREE = 3;       // The 'd' in d-MST
 
 struct Edge {
     int u, v;
@@ -103,10 +101,6 @@ public:
                     }
                 }
 
-                // Note: The paper implies if the list is shorter than the allele index,
-                // we take the last valid edge available (the highest weight considered).
-                // The loop above naturally leaves candidateForNodeI as the last valid edge 
-                // if we exhaust the list without hitting the exact index.
                 if (candidateForNodeI.u != -1) {
                     foundForNodeI = true;
                 }
@@ -294,10 +288,7 @@ int main() {
         }
     }
 
-    MAX_DEGREE = K;
-
-    // cerr << "Running GA with RPM for degree constraint d=" << MAX_DEGREE << endl;
-    GeneticAlgorithm ga(G, POPULATION_SIZE, MAX_DEGREE);
+    GeneticAlgorithm ga(G, POPULATION_SIZE, K);
     
     ga.initializePopulation();
     ga.run(GENERATIONS);
